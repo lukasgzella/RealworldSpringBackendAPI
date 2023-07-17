@@ -9,6 +9,7 @@ import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRep
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -28,18 +29,35 @@ public class CommonService {
         System.out.println(addedUser.toString());
     }
 
-    public void followUserById(long userIdFrom, long userIdTo) {
+    @Transactional
+    public void followUserById(long userIdFrom, long userIdTo) throws InterruptedException {
         User userFrom = userRepository.findById(userIdFrom);
+        System.out.println(userFrom);
         User userTo = userRepository.findById(userIdTo);
+        System.out.println(userTo);
+        Thread.sleep(10000);
         Follower follower = new Follower(userFrom,userTo);
-        List<Follower> following = userFrom.getFollowing();
+        Thread.sleep(10000);
+        System.out.println(follower);
+        follower = followerRepository.save(follower);
+        Thread.sleep(10000);
+        System.out.println(follower);
+        Set<Follower> following = userFrom.getFollowing();
+        Thread.sleep(4000);
+        System.out.println(following);
+        Thread.sleep(4000);
         following.add(follower);
-        List<Follower> followers = userTo.getFollowers();
+        Thread.sleep(4000);
+        Set<Follower> followers = userTo.getFollowers();
+        Thread.sleep(4000);
+        System.out.println(followers);
         followers.add(follower);
+        Thread.sleep(4000);
+        System.out.println(followers);
+        Thread.sleep(4000);
 
         userRepository.save(userFrom);
         userRepository.save(userTo);
-        followerRepository.save(follower);
     }
 
 

@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EqualsAndHashCode
 @Table(name = "followers")
 public class Follower {
 
@@ -38,5 +39,18 @@ public class Follower {
                 ", from=" + from.getUsername() +
                 ", to=" + to.getUsername() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Follower follower = (Follower) o;
+        return Objects.equals(id, follower.id) && Objects.equals(from, follower.from) && Objects.equals(to, follower.to);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, from.getUsername(), to.getUsername());
     }
 }

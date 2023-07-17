@@ -22,11 +22,20 @@ public class User {
     private Long id;
     private String username;
     @OneToMany(mappedBy = "to")
-    private List<Follower> followers;
+    private Set<Follower> followers;
     @OneToMany(mappedBy = "from")
-    private List<Follower> following;
+    private Set<Follower> following;
     @OneToMany(mappedBy = "author")
     private List<Article> articles;
 
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", followers=" + followers +
+                ", following=" + following +
+                '}';
+    }
 }
