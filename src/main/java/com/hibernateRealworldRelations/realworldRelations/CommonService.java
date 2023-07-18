@@ -1,10 +1,11 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
-import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.CommentRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class CommonService {
     private final UserRepository userRepository;
     private final FollowerRepository followerRepository;
     private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
 
     public void addUser(String username) {
         User user = User.builder().username(username).build();
@@ -34,46 +36,54 @@ public class CommonService {
         User userFrom = userRepository.findById(userIdFrom);
         System.out.println(userFrom);
         User userTo = userRepository.findById(userIdTo);
-        System.out.println(userTo);
-        Thread.sleep(10000);
         Follower follower = new Follower(userFrom,userTo);
-        Thread.sleep(10000);
-        System.out.println(follower);
         follower = followerRepository.save(follower);
-        Thread.sleep(10000);
-        System.out.println(follower);
         Set<Follower> following = userFrom.getFollowing();
-        Thread.sleep(4000);
-        System.out.println(following);
-        Thread.sleep(4000);
         following.add(follower);
-        Thread.sleep(4000);
         Set<Follower> followers = userTo.getFollowers();
-        Thread.sleep(4000);
-        System.out.println(followers);
         followers.add(follower);
-        Thread.sleep(4000);
-        System.out.println(followers);
-        Thread.sleep(4000);
 
         userRepository.save(userFrom);
         userRepository.save(userTo);
     }
 
 
+    @Transactional
     public void addArticleByUserId(long id) {
         User author = userRepository.findById(id);
         Article article = Article.builder().author(author).build();
+        article = articleRepository.save(article);
         List<Article> articles = author.getArticles();
         articles.add(article);
         author.setArticles(articles);
 
         userRepository.save(author);
-        articleRepository.save(article);
+        System.out.println("article with id: " + article.getId() + " added to repository");
+        System.out.println(article);
     }
 
+    @Transactional
     public void printUserById(long userId) {
         User author = userRepository.findById(userId);
         System.out.println(author);
+    }
+
+    @Transactional
+    public void addCommentToArticle(long articleId) {
+        Article article = articleRepository.findById(articleId);
+        Comment comment = Comment.builder().article(article).build();
+        comment = commentRepository.save(comment);
+        List<Comment> comments = article.getComments();
+        comments.add(comment);
+        article.setComments(comments);
+
+        articleRepository.save(article);
+        System.out.println("comment with article_id: " + article.getId() + " added to repository");
+        System.out.println(comment);
+    }
+
+    public void printArticleById(long articleId) {
+        Article article = articleRepository.findById(articleId);
+        System.out.println(article);
     }
 }

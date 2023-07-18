@@ -27,6 +27,9 @@ public class User {
     private Set<Follower> following;
     @OneToMany(mappedBy = "author")
     private List<Article> articles;
+    //todo
+//    @OneToMany(mappedBy = "author")
+//    private List<Comment> comments;
 
 
     @Override
@@ -36,6 +39,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", followers=" + followers +
                 ", following=" + following +
+                ", articles=" + articles +
                 '}';
     }
 }

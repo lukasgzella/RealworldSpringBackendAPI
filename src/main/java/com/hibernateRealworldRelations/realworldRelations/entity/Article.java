@@ -18,7 +18,18 @@ public class Article {
     @Column(name = "article_id")
     private Long id;
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="user_id")
     private User author;
+    @OneToMany(mappedBy = "article")
+    private List<Comment> comments;
 
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                "id=" + id +
+                ", author=" + author.getUsername() +
+                ", comments=" + comments +
+                '}';
+    }
 }

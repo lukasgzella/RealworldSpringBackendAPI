@@ -2,18 +2,14 @@ package com.hibernateRealworldRelations.realworldRelations.repository;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
-
 
 public interface ArticleRepository extends CrudRepository<Article, Long> {
 
-//    @Query(
+    //    @Query(
 //            """
 //                    SELECT a FROM Article a
 //                    WHERE (:tag IS NULL OR :tag IN (SELECT t.tag.name FROM a.includeTags t))
@@ -29,4 +25,11 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
 //    );
 //    Page<Article> findByAuthorOrderByCreatedAtDesc(Collection<User> authors, Pageable pageable);
 //    Article findBySlug(String slug);
+    @Query("""
+            SELECT a FROM Article a 
+            LEFT JOIN FETCH a.comments 
+                        
+            WHERE (a.id = :id) 
+            """)
+    Article findById(@Param("id") long id);
 }

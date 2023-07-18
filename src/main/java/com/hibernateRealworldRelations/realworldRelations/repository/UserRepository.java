@@ -14,6 +14,7 @@ public interface UserRepository extends CrudRepository<User,Long> {
             SELECT u FROM User u 
             LEFT JOIN FETCH u.following 
             LEFT JOIN FETCH u.followers 
+            LEFT JOIN FETCH u.articles 
             WHERE (u.id = :id) 
             """)
     User findById(@Param("id") long id);

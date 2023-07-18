@@ -26,6 +26,8 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("2 - create article");
 			System.out.println("3 - add folower");
 			System.out.println("4 - print user");
+			System.out.println("5 - add comment");
+			System.out.println("6 - print article");
 			System.out.println("e - exit");
 
 			System.out.println("Choose from menu");
@@ -54,6 +56,18 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 					System.out.println("Enter userId: ");
 					long userId = Long.parseLong(scanner.nextLine());
 					service.printUserById(userId);
+					break;
+				}
+				case "5":	{
+					System.out.println("Enter articleId: ");
+					long articleId = Long.parseLong(scanner.nextLine());
+					service.addCommentToArticle(articleId);
+					break;
+				}
+				case "6":	{
+					System.out.println("Enter articleId: ");
+					long articleId = Long.parseLong(scanner.nextLine());
+					service.printArticleById(articleId);
 					break;
 				}
 				case "e": break LOOP;
