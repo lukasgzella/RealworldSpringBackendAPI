@@ -28,8 +28,8 @@ public class User {
     @OneToMany(mappedBy = "author")
     private List<Article> articles;
     //todo
-//    @OneToMany(mappedBy = "author")
-//    private List<Comment> comments;
+    @OneToMany(mappedBy = "author")
+    private List<Comment> comments;
 
 
     @Override

@@ -16,10 +16,9 @@ public class Comment {
     @GeneratedValue
     @Column(name = "comment_id")
     private Long id;
-    //todo
-//    @ManyToOne
-//    @JoinColumn(name="user_id")
-//    private User author;
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User author;
     @ManyToOne
     @JoinColumn(name="article_id")
     private Article article;
@@ -29,6 +28,7 @@ public class Comment {
         return "Comment{" +
                 "comment_id=" + id +
                 ", article_id=" + article.getId() +
+                ", user_id=" + author.getId() +
                 '}';
     }
 }

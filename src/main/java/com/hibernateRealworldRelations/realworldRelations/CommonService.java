@@ -69,15 +69,20 @@ public class CommonService {
     }
 
     @Transactional
-    public void addCommentToArticle(long articleId) {
+    public void addCommentToArticle(long articleId, long userId) {
         Article article = articleRepository.findById(articleId);
-        Comment comment = Comment.builder().article(article).build();
+        User author = userRepository.findById(userId);
+        Comment comment = Comment.builder().article(article).author(author).build();
         comment = commentRepository.save(comment);
         List<Comment> comments = article.getComments();
+        List<Comment> userComments = author.getComments();
         comments.add(comment);
+        userComments.add(comment);
         article.setComments(comments);
+        author.setComments(userComments);
 
         articleRepository.save(article);
+        userRepository.save(author);
         System.out.println("comment with article_id: " + article.getId() + " added to repository");
         System.out.println(comment);
     }

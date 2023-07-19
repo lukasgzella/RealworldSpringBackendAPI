@@ -61,7 +61,9 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 				case "5":	{
 					System.out.println("Enter articleId: ");
 					long articleId = Long.parseLong(scanner.nextLine());
-					service.addCommentToArticle(articleId);
+					System.out.println("Enter userId: ");
+					long userId = Long.parseLong(scanner.nextLine());
+					service.addCommentToArticle(articleId, userId);
 					break;
 				}
 				case "6":	{
