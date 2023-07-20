@@ -2,7 +2,9 @@ package com.hibernateRealworldRelations.realworldRelations.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -20,6 +22,9 @@ public class Article {
     @ManyToOne
     @JoinColumn(name="user_id")
     private User author;
+    @Builder.Default
+    @ManyToMany(mappedBy = "favoriteArticles")
+    private Set<User> followingUsers = new HashSet<>();
     @OneToMany(mappedBy = "article")
     private List<Comment> comments;
 
@@ -30,6 +35,8 @@ public class Article {
                 "id=" + id +
                 ", author=" + author.getUsername() +
                 ", comments=" + comments +
+                ", followingUsers=" + followingUsers.stream().map(User::getUsername).toList() +
+                ", favoritesCount=" + followingUsers.size() +
                 '}';
     }
 }

@@ -87,8 +87,24 @@ public class CommonService {
         System.out.println(comment);
     }
 
+    @Transactional
     public void printArticleById(long articleId) {
         Article article = articleRepository.findById(articleId);
         System.out.println(article);
+    }
+
+    @Transactional
+    public void makeArticleFavorite(long articleId, long userId) {
+        Article article = articleRepository.findById(articleId);
+        User user = userRepository.findById(userId);
+        Set<Article> favoritesArticles = user.getFavoriteArticles();
+        Set<User> followingUsers = article.getFollowingUsers();
+        favoritesArticles.add(article);
+        followingUsers.add(user);
+        article.setFollowingUsers(followingUsers);
+        user.setFavoriteArticles(favoritesArticles);
+
+        articleRepository.save(article);
+        userRepository.save(user);
     }
 }
