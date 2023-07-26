@@ -27,6 +27,9 @@ public class Article {
     private Set<User> followingUsers = new HashSet<>();
     @OneToMany(mappedBy = "article")
     private List<Comment> comments;
+    @Builder.Default
+    @OneToMany(mappedBy = "article")
+    private Set<Tag> tagList = new HashSet<>();
 
 
     @Override
@@ -37,6 +40,7 @@ public class Article {
                 ", comments=" + comments +
                 ", followingUsers=" + followingUsers.stream().map(User::getUsername).toList() +
                 ", favoritesCount=" + followingUsers.size() +
+                ", tagList" + tagList.stream().map(Tag::getName).toList() +
                 '}';
     }
 }

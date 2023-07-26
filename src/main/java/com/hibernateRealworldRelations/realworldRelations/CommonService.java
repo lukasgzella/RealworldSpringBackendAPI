@@ -1,13 +1,7 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
-import com.hibernateRealworldRelations.realworldRelations.entity.Article;
-import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
-import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
-import com.hibernateRealworldRelations.realworldRelations.entity.User;
-import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.CommentRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
+import com.hibernateRealworldRelations.realworldRelations.entity.*;
+import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +17,7 @@ public class CommonService {
     private final FollowerRepository followerRepository;
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
+    private final TagRepository tagRepository;
 
     public void addUser(String username) {
         User user = User.builder().username(username).build();
@@ -106,5 +101,17 @@ public class CommonService {
 
         articleRepository.save(article);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void addTagToArticle(long articleId, String tagName) {
+        Article article = articleRepository.findById(articleId);
+        Tag tag = Tag.builder().article(article).name(tagName).build();
+        tag = tagRepository.save(tag);
+        Set<Tag> tags = article.getTagList();
+        tags.add(tag);
+        article.setTagList(tags);
+
+        articleRepository.save(article);
     }
 }

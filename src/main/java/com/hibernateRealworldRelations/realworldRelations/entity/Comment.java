@@ -22,6 +22,10 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name="article_id")
     private Article article;
+    private String createdAt;
+    private String updatedAt;
+    private String body;
+
 
     @Override
     public String toString() {

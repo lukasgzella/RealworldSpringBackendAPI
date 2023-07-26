@@ -29,6 +29,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("5 - add comment");
 			System.out.println("6 - print article");
 			System.out.println("7 - make article favorite");
+			System.out.println("8 - add tag to article");
 			System.out.println("e - exit");
 
 			System.out.println("Choose from menu");
@@ -79,6 +80,14 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 					System.out.println("Enter userId: ");
 					long userId = Long.parseLong(scanner.nextLine());
 					service.makeArticleFavorite(articleId, userId);
+					break;
+				}
+				case "8":	{
+					System.out.println("Enter articleId: ");
+					long articleId = Long.parseLong(scanner.nextLine());
+					System.out.println("Enter tagName: ");
+					String tagName = scanner.nextLine();
+					service.addTagToArticle(articleId, tagName);
 					break;
 				}
 				case "e": break LOOP;
