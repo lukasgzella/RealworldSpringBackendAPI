@@ -32,4 +32,10 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             WHERE (a.id = :id) 
             """)
     Article findById(@Param("id") long id);
+
+    @Query("""
+            SELECT a FROM Article a 
+            WHERE a.author = :author 
+            """)
+    Article findByAuthor(@Param("author") String author);
 }

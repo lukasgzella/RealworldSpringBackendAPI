@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class RealworldRelationsApplication implements CommandLineRunner {
 
 	private final CommonService service;
+	private final ArticleController articleController;
 
 	public static void main(String[] args) {
 		SpringApplication.run(RealworldRelationsApplication.class, args);
@@ -30,6 +31,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("6 - print article");
 			System.out.println("7 - make article favorite");
 			System.out.println("8 - add tag to article");
+			System.out.println("9 - go to Article Controller");
 			System.out.println("e - exit");
 
 			System.out.println("Choose from menu");
@@ -88,6 +90,11 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 					System.out.println("Enter tagName: ");
 					String tagName = scanner.nextLine();
 					service.addTagToArticle(articleId, tagName);
+					break;
+				}
+				case "9":	{
+					System.out.println("---> go to articleController...");
+					articleController.chooseAction();
 					break;
 				}
 				case "e": break LOOP;
