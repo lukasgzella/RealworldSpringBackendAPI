@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 
 public interface ArticleRepository extends CrudRepository<Article, Long> {
 
@@ -35,7 +37,23 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
 
     @Query("""
             SELECT a FROM Article a 
-            WHERE a.author = :author 
+            LEFT JOIN FETCH a.author 
+            LEFT JOIN FETCH a.tagList 
+            WHERE a.author.username = :author 
             """)
     Article findByAuthor(@Param("author") String author);
+
+    @Query("""
+            SELECT a FROM Article a 
+            LEFT JOIN FETCH a.author 
+            LEFT JOIN FETCH a.tagList 
+            WHERE a.author.username = :author 
+            """)
+    List<Article> findArticlesByAuthor(@Param("author") String author);
+
+//    @Query("""
+//            SELECT a FROM Article a
+//            WHERE a.tag = :tag
+//            """)
+//    Article findByTag(@Param("author") String tag);
 }

@@ -32,6 +32,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("7 - make article favorite");
 			System.out.println("8 - add tag to article");
 			System.out.println("9 - go to Article Controller");
+			System.out.println("t - add test data");
 			System.out.println("e - exit");
 
 			System.out.println("Choose from menu");
@@ -95,6 +96,11 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 				case "9":	{
 					System.out.println("---> go to articleController...");
 					articleController.chooseAction();
+					break;
+				}
+				case "t":	{
+					System.out.println("---> Add test data");
+					service.addTestData();
 					break;
 				}
 				case "e": break LOOP;

@@ -1,11 +1,14 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
+import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Scanner;
 
 @Service
@@ -30,7 +33,7 @@ public class ArticleService {
                 case "1": {
                     System.out.println("enter author name:");
                     String author = scanner.nextLine();
-                    getArticlesByAuthor(author);
+                    getArticleListByAuthor(author);
                     break;
                 }
                 case "2": {
@@ -48,15 +51,21 @@ public class ArticleService {
         }
     }
 
-    @Transactional
     public void getArticlesByAuthor(String author) {
         Article article = articleRepository.findByAuthor(author);
-        System.out.println(article);
+        System.out.println("Article{" +
+                "id=" + article.getId() +
+                ", tagList=" + article.getTagList().stream().map(Tag::getName).toList() +
+                ", author=" + article.getAuthor().getUsername() + "}");
     }
-    @Transactional
-    public void getArticlesByTag(String author) {
-        Article article = articleRepository.findByAuthor(author);
-        System.out.println(article);
+    public void getArticleListByAuthor(String author) {
+        List<Article> articles = articleRepository.findArticlesByAuthor(author);
+        int articlesCount = articles.size();
+        articles.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId() +
+                ", tagList=" + article.getTagList().stream().map(Tag::getName).toList() +
+                ", author=" + article.getAuthor().getUsername() + "}" +
+                "articlesCount=" + articlesCount
+        ));
     }
-
 }
