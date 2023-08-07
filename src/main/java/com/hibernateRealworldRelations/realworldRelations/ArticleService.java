@@ -2,11 +2,9 @@ package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
-import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Scanner;
@@ -39,6 +37,7 @@ public class ArticleService {
                 case "2": {
                     System.out.println("enter tag name:");
                     String tag = scanner.nextLine();
+                    getArticleListByTag(tag);
                     break;
                 }
                 case "3": {
@@ -51,13 +50,17 @@ public class ArticleService {
         }
     }
 
-    public void getArticlesByAuthor(String author) {
-        Article article = articleRepository.findByAuthor(author);
-        System.out.println("Article{" +
+    private void getArticleListByTag(String tag) {
+        List<Article> articles = articleRepository.findArticlesByTag(tag);
+        int articlesCount = articles.size();
+        articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId() +
-                ", tagList=" + article.getTagList().stream().map(Tag::getName).toList() +
-                ", author=" + article.getAuthor().getUsername() + "}");
+//                ", tagList=" + article.getTagList().stream().map(Tag::getName).toList() +
+//                ", author=" + article.getAuthor().getUsername() + "}" +
+                "articlesCount=" + articlesCount
+        ));
     }
+
     public void getArticleListByAuthor(String author) {
         List<Article> articles = articleRepository.findArticlesByAuthor(author);
         int articlesCount = articles.size();

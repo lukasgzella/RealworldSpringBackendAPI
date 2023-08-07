@@ -115,10 +115,10 @@ public class CommonService {
         articleRepository.save(article);
     }
 
-    public void addTestData() throws InterruptedException {
-        addUser("stefek");
-        addUser("bobek");
-        addUser("muminek");
+    public void addTestData() {
+        addUser("john");
+        addUser("mike");
+        addUser("bob");
         addArticleByUserId(1); // article_id = 1
         addArticleByUserId(1); // article_id = 2
     }

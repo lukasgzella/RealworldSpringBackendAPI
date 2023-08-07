@@ -1,7 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations.repository;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
-import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -41,15 +40,13 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             LEFT JOIN FETCH a.tagList 
             WHERE a.author.username = :author 
             """)
-    Article findByAuthor(@Param("author") String author);
+    List<Article> findArticlesByAuthor(@Param("author") String author);
 
     @Query("""
-            SELECT a FROM Article a 
-            LEFT JOIN FETCH a.author 
-            LEFT JOIN FETCH a.tagList 
-            WHERE a.author.username = :author 
+            SELECT a FROM Article a
+            WHERE (:tag IN (SELECT t.name FROM a.tagList t))
             """)
-    List<Article> findArticlesByAuthor(@Param("author") String author);
+    List<Article> findArticlesByTag(@Param("tag") String tag);
 
 //    @Query("""
 //            SELECT a FROM Article a
