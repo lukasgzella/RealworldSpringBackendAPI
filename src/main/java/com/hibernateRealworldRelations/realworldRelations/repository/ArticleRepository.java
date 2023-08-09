@@ -48,9 +48,9 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             """)
     List<Article> findArticlesByTag(@Param("tag") String tag);
 
-//    @Query("""
-//            SELECT a FROM Article a
-//            WHERE a.tag = :tag
-//            """)
-//    Article findByTag(@Param("author") String tag);
+    @Query("""
+            SELECT a FROM Article a
+            WHERE (:favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            """)
+    List<Article> findArticlesByFavorited(@Param("favorited") String favorited);
 }

@@ -116,10 +116,17 @@ public class CommonService {
     }
 
     public void addTestData() {
-        addUser("john");
-        addUser("mike");
-        addUser("bob");
+        addUser("john"); // user_id = 1
+        addUser("mike"); // user_id = 2
+        addUser("bob"); // user_id = 3
+        addUser("rob"); // user_id = 4
         addArticleByUserId(1); // article_id = 1
         addArticleByUserId(1); // article_id = 2
+    }
+    public void makeTestArticleFavorite() {
+        makeArticleFavorite(1,1);
+        makeArticleFavorite(1,2);
+        makeArticleFavorite(2,3);
+        makeArticleFavorite(2,4);
     }
 }

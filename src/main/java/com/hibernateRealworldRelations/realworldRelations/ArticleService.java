@@ -41,7 +41,9 @@ public class ArticleService {
                     break;
                 }
                 case "3": {
-                    System.out.println("is favorited? y/n");
+                    System.out.println("enter favorited username:");
+                    String name = scanner.nextLine();
+                    getArticleListByfavorited(name);
                     break;
                 }
                 case "e":
@@ -50,13 +52,20 @@ public class ArticleService {
         }
     }
 
+    private void getArticleListByfavorited(String name) {
+        List<Article> articles = articleRepository.findArticlesByFavorited(name);
+        int articlesCount = articles.size();
+        articles.forEach(article -> System.out.println("Article{" +
+                        "id=" + article.getId() +
+                        "articlesCount=" + articlesCount
+        ));
+    }
+
     private void getArticleListByTag(String tag) {
         List<Article> articles = articleRepository.findArticlesByTag(tag);
         int articlesCount = articles.size();
         articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId() +
-//                ", tagList=" + article.getTagList().stream().map(Tag::getName).toList() +
-//                ", author=" + article.getAuthor().getUsername() + "}" +
                 "articlesCount=" + articlesCount
         ));
     }

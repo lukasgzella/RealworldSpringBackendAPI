@@ -112,9 +112,8 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 					service.addTagToArticle(2,"t2a2");
 					break;
 				}
-				case "e": break LOOP;
+				case "e": System.exit(0);
 			}
-
 		}
 	}
 }
