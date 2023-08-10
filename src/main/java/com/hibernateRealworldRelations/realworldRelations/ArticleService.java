@@ -24,6 +24,7 @@ public class ArticleService {
             System.out.println("1 - author");
             System.out.println("2 - tag");
             System.out.println("3 - favorited");
+            System.out.println("4 - author/tag/favorited");
 
             System.out.println("e - exit");
 
@@ -46,10 +47,29 @@ public class ArticleService {
                     getArticleListByfavorited(name);
                     break;
                 }
+                case "4": {
+                    System.out.println("enter author name:");
+                    String author = scanner.nextLine();
+                    System.out.println("enter tag name:");
+                    String tag = scanner.nextLine();
+                    System.out.println("enter favorited username:");
+                    String name = scanner.nextLine();
+                    getArticleListByManyParams(author, tag, name);
+                    break;
+                }
                 case "e":
                     break LOOP;
             }
         }
+    }
+
+    private void getArticleListByManyParams(String author, String tag, String name) {
+        List<Article> articles = articleRepository.findArticlesByParams(author, tag, name);
+        int articlesCount = articles.size();
+        articles.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId() +
+                "articlesCount=" + articlesCount
+        ));
     }
 
     private void getArticleListByfavorited(String name) {

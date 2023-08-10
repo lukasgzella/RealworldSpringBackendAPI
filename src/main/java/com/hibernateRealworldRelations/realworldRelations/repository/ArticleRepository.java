@@ -28,8 +28,7 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
 //    Article findBySlug(String slug);
     @Query("""
             SELECT a FROM Article a 
-            LEFT JOIN FETCH a.comments 
-                        
+            LEFT JOIN FETCH a.comments
             WHERE (a.id = :id) 
             """)
     Article findById(@Param("id") long id);
@@ -53,4 +52,16 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             WHERE (:favorited IN (SELECT fu.username FROM a.followingUsers fu))
             """)
     List<Article> findArticlesByFavorited(@Param("favorited") String favorited);
+
+    @Query("""
+            SELECT a FROM Article a
+            WHERE a.author.username = :author
+            AND (:tag IN (SELECT t.name FROM a.tagList t))
+            AND (:favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            """)
+    List<Article> findArticlesByParams(
+            @Param("author") String author,
+            @Param("tag") String tag,
+            @Param("favorited") String favorited
+    );
 }
