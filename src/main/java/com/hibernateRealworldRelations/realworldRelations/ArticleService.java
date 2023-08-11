@@ -4,6 +4,9 @@ import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +19,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
 
 
-    public void getArticles(int limit, int offset) {
+    public void getArticles() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("You are in article service mock, find article by: ");
         LOOP:
@@ -25,6 +28,7 @@ public class ArticleService {
             System.out.println("2 - tag");
             System.out.println("3 - favorited");
             System.out.println("4 - author/tag/favorited");
+            System.out.println("5 - page - author/tag/favorited/limit/offset");
 
             System.out.println("e - exit");
 
@@ -50,17 +54,58 @@ public class ArticleService {
                 case "4": {
                     System.out.println("enter author name:");
                     String author = scanner.nextLine();
+                    if (author.equals("null")) {
+                        author = null;
+                    }
                     System.out.println("enter tag name:");
                     String tag = scanner.nextLine();
+                    if (tag.equals("null")) {
+                        tag = null;
+                    }
                     System.out.println("enter favorited username:");
                     String name = scanner.nextLine();
+                    if (name.equals("null")) {
+                        name = null;
+                    }
                     getArticleListByManyParams(author, tag, name);
+                    break;
+                }
+                case "5": {
+                    System.out.println("enter author name:");
+                    String author = scanner.nextLine();
+                    if (author.equals("null")) {
+                        author = null;
+                    }
+                    System.out.println("enter tag name:");
+                    String tag = scanner.nextLine();
+                    if (tag.equals("null")) {
+                        tag = null;
+                    }
+                    System.out.println("enter favorited username:");
+                    String name = scanner.nextLine();
+                    if (name.equals("null")) {
+                        name = null;
+                    }
+                    System.out.println("Limit? ");
+                    int limit = Integer.parseInt(scanner.nextLine());
+                    System.out.println("Offset? ");
+                    int offset = Integer.parseInt(scanner.nextLine());
+                    getArticlePageByManyParams(author, tag, name, limit, offset);
                     break;
                 }
                 case "e":
                     break LOOP;
             }
         }
+    }
+
+    private void getArticlePageByManyParams(String author, String tag, String name, int limit, int offset) {
+        Page<Article> page = articleRepository.findArticlesByParamsPage(author, tag, name, PageRequest.of(offset, limit));
+        long articlesCount = page.getTotalElements();
+        page.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId() +
+                "articlesCount=" + articlesCount
+        ));
     }
 
     private void getArticleListByManyParams(String author, String tag, String name) {

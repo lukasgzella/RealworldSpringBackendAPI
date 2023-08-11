@@ -1,6 +1,8 @@
 package com.hibernateRealworldRelations.realworldRelations.repository;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -55,13 +57,25 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
 
     @Query("""
             SELECT a FROM Article a
-            WHERE a.author.username = :author
-            AND (:tag IN (SELECT t.name FROM a.tagList t))
-            AND (:favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            WHERE (:author IS NULL OR a.author.username = :author)
+            AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
+            AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
             """)
     List<Article> findArticlesByParams(
             @Param("author") String author,
             @Param("tag") String tag,
             @Param("favorited") String favorited
+    );
+    @Query("""
+            SELECT a FROM Article a
+            WHERE (:author IS NULL OR a.author.username = :author)
+            AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
+            AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            """)
+    Page<Article> findArticlesByParamsPage(
+            @Param("author") String author,
+            @Param("tag") String tag,
+            @Param("favorited") String favorited,
+            Pageable pageable
     );
 }

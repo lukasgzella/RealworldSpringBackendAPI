@@ -27,11 +27,7 @@ public class ArticleController {
 
             switch (scanner.nextLine()) {
                 case "1": {
-                    System.out.println("Limit? ");
-//                    int limit = Integer.parseInt(scanner.nextLine());
-                    System.out.println("Offset? ");
-//                    int offset = Integer.parseInt(scanner.nextLine());
-                    articleService.getArticles(1, 1);
+                    articleService.getArticles();
                     break;
                 }
                 case "e":

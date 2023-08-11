@@ -120,13 +120,21 @@ public class CommonService {
         addUser("mike"); // user_id = 2
         addUser("bob"); // user_id = 3
         addUser("rob"); // user_id = 4
+        addUser("albrecht"); // user_id = 5
+        addUser("szczepan"); // user_id = 6
+        addUser("steven"); // user_id = 7
+        addUser("james"); // user_id = 8
+        addUser("peter"); // user_id = 9
+        addUser("jason"); // user_id = 10
         addArticleByUserId(1); // article_id = 1
-        addArticleByUserId(1); // article_id = 2
-    }
-    public void makeTestArticleFavorite() {
-        makeArticleFavorite(1,1);
-        makeArticleFavorite(1,2);
-        makeArticleFavorite(2,3);
-        makeArticleFavorite(2,4);
+        addArticleByUserId(2); // article_id = 2
+        addArticleByUserId(3); // article_id = 3
+        addArticleByUserId(4); // article_id = 4
+        addArticleByUserId(5); // article_id = 5
+        addArticleByUserId(6); // article_id = 6
+        addArticleByUserId(7); // article_id = 7
+        addArticleByUserId(8); // article_id = 8
+        addArticleByUserId(9); // article_id = 9
+        addArticleByUserId(10); // article_id = 10
     }
 }
