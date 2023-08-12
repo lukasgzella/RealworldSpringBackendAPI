@@ -1,12 +1,14 @@
 package com.hibernateRealworldRelations.realworldRelations.repository;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -78,4 +80,6 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             @Param("favorited") String favorited,
             Pageable pageable
     );
+
+    List<Article> findByAuthor(Collection<User> authors);
 }

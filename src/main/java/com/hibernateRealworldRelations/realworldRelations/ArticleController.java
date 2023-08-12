@@ -17,6 +17,9 @@ public class ArticleController {
         LOOP:
         while (true) {
             System.out.println("1 - getArticles");
+
+//            Authentication required, will return multiple articles created by followed users,
+//            ordered by most recent first.
             System.out.println("2 - feedArticles");
             System.out.println("3 - getArticle");
             System.out.println("4 - createArticle");
@@ -28,6 +31,10 @@ public class ArticleController {
             switch (scanner.nextLine()) {
                 case "1": {
                     articleService.getArticles();
+                    break;
+                }
+                case "2": {
+                    articleService.feedArticles();
                     break;
                 }
                 case "e":

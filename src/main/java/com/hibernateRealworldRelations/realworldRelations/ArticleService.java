@@ -1,8 +1,11 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
+import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,13 +14,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-
+    private final UserRepository userRepository;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -97,6 +102,27 @@ public class ArticleService {
                     break LOOP;
             }
         }
+    }
+
+    public void feedArticles() {
+        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Limit? ");
+//        int limit = Integer.parseInt(scanner.nextLine());
+//        System.out.println("Offset? ");
+//        int offset = Integer.parseInt(scanner.nextLine());
+        System.out.println("Current user? ");
+        String username = scanner.nextLine();
+        User user = userRepository.findByUsername(username).orElseThrow();
+        Set<Follower> following = user.getFollowing();
+        Set<User> authors = following
+                .stream()
+                .map(follower -> User.builder().id(follower.getTo().getId()).build())
+                .collect(Collectors.toSet());
+        List<Article> articles = articleRepository.findByAuthor(authors);
+        articles.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId()
+        ));
+
     }
 
     private void getArticlePageByManyParams(String author, String tag, String name, int limit, int offset) {
