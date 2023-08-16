@@ -80,6 +80,9 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             @Param("favorited") String favorited,
             Pageable pageable
     );
-
-    List<Article> findByAuthor(Collection<User> authors);
+    @Query("""
+            SELECT a FROM Article a
+            WHERE a.author.id IN (SELECT f.to.id FROM Follower f WHERE f.from.id = :user_id)
+            """)
+    List<Article> findByFollowingUser(@Param("user_id") String user_id, Pageable pageable);
 }

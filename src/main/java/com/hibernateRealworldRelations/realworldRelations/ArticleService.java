@@ -106,19 +106,13 @@ public class ArticleService {
 
     public void feedArticles() {
         Scanner scanner = new Scanner(System.in);
-//        System.out.println("Limit? ");
-//        int limit = Integer.parseInt(scanner.nextLine());
-//        System.out.println("Offset? ");
-//        int offset = Integer.parseInt(scanner.nextLine());
-        System.out.println("Current user? ");
-        String username = scanner.nextLine();
-        User user = userRepository.findByUsername(username).orElseThrow();
-        Set<Follower> following = user.getFollowing();
-        Set<User> authors = following
-                .stream()
-                .map(follower -> User.builder().id(follower.getTo().getId()).build())
-                .collect(Collectors.toSet());
-        List<Article> articles = articleRepository.findByAuthor(authors);
+        System.out.println("Limit? ");
+        int limit = Integer.parseInt(scanner.nextLine());
+        System.out.println("Offset? ");
+        int offset = Integer.parseInt(scanner.nextLine());
+        System.out.println("Current user_id? ");
+        String user_id = scanner.nextLine();
+        List<Article> articles = articleRepository.findByFollowingUser(user_id, PageRequest.of(offset, limit));
         articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId()
         ));
