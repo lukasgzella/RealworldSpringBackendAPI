@@ -85,4 +85,5 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             WHERE a.author.id IN (SELECT f.to.id FROM Follower f WHERE f.from.id = :user_id)
             """)
     List<Article> findByFollowingUser(@Param("user_id") String user_id, Pageable pageable);
+
 }

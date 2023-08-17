@@ -31,6 +31,7 @@ public class Article {
     @OneToMany(mappedBy = "article")
     private Set<Tag> tagList = new HashSet<>();
 
+    private String title;
 
     @Override
     public String toString() {

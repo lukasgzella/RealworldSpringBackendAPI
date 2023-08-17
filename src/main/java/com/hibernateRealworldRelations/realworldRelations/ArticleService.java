@@ -5,6 +5,7 @@ import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.TagRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -23,6 +25,7 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final TagRepository tagRepository;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -141,8 +144,8 @@ public class ArticleService {
         List<Article> articles = articleRepository.findArticlesByFavorited(name);
         int articlesCount = articles.size();
         articles.forEach(article -> System.out.println("Article{" +
-                        "id=" + article.getId() +
-                        "articlesCount=" + articlesCount
+                "id=" + article.getId() +
+                "articlesCount=" + articlesCount
         ));
     }
 
@@ -164,5 +167,31 @@ public class ArticleService {
                 ", author=" + article.getAuthor().getUsername() + "}" +
                 "articlesCount=" + articlesCount
         ));
+    }
+
+    public void createArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Current user_id? ");
+        String userId = scanner.nextLine();
+        User user = userRepository.findById(Long.parseLong(userId));
+        System.out.println("title?");
+        String title = scanner.nextLine();
+        // in spec: title, description, body, optional taglist
+        // description, body omitted for shortening
+
+        System.out.println("taglist? Enter tags separated by spaces");
+        List<String> stringList = Arrays.stream(scanner.nextLine().split("\s")).toList();
+        Article article = Article.builder()
+                .author(user)
+                .title(title)
+                .build();
+        Article savedArticle = articleRepository.save(article);
+        Set<Tag> tags = stringList.stream().map(s -> Tag.builder().article(savedArticle).name(s).build()).collect(Collectors.toSet());
+        tags.forEach(tagRepository::save);
+        System.out.println("tags: ");
+        tags.forEach(tag -> System.out.println(tag.getId() + " " + tag.getName()));
+        savedArticle.setTagList(tags);
+        System.out.println(savedArticle.toString());
+        // todo issue: tags are added despite of same existing tags which are related with another article
     }
 }
