@@ -105,14 +105,16 @@ public class CommonService {
 
     @Transactional
     public void addTagToArticle(long articleId, String tagName) {
-        Article article = articleRepository.findById(articleId);
-        Tag tag = Tag.builder().article(article).name(tagName).build();
-        tag = tagRepository.save(tag);
-        Set<Tag> tags = article.getTagList();
-        tags.add(tag);
-        article.setTagList(tags);
+        System.out.println("Feature temporary disabled");
 
-        articleRepository.save(article);
+//        Article article = articleRepository.findById(articleId);
+//        Tag tag = Tag.builder().article(article).name(tagName).build();
+//        tag = tagRepository.save(tag);
+//        Set<Tag> tags = article.getTagList();
+//        tags.add(tag);
+//        article.setTagList(tags);
+//
+//        articleRepository.save(article);
     }
 
     public void addTestData() {

@@ -179,19 +179,24 @@ public class ArticleService {
         // in spec: title, description, body, optional taglist
         // description, body omitted for shortening
 
+        // get tag names from user
         System.out.println("taglist? Enter tags separated by spaces");
         List<String> stringList = Arrays.stream(scanner.nextLine().split("\s")).toList();
-        Article article = Article.builder()
+        // create new article with id
+        Article savedArticle = articleRepository.save(Article.builder()
                 .author(user)
                 .title(title)
-                .build();
-        Article savedArticle = articleRepository.save(article);
-        Set<Tag> tags = stringList.stream().map(s -> Tag.builder().article(savedArticle).name(s).build()).collect(Collectors.toSet());
-        tags.forEach(tagRepository::save);
-        System.out.println("tags: ");
-        tags.forEach(tag -> System.out.println(tag.getId() + " " + tag.getName()));
-        savedArticle.setTagList(tags);
-        System.out.println(savedArticle.toString());
-        // todo issue: tags are added despite of same existing tags which are related with another article
+                .build());
+        // check if there are existing tags with name from stringList in tagRepository
+        // optional
+        Set<Tag> existingTags = stringList
+                .stream()
+                .map(s -> tagRepository.findByName(s)
+                        .orElseGet(() -> new Tag(s))).collect(Collectors.toSet());
+        // update tags with savedArticle
+        existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
+        existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());
+        savedArticle.setTagList(existingTags);
+        articleRepository.save(savedArticle);
     }
 }

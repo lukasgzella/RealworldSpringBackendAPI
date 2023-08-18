@@ -3,7 +3,9 @@ package com.hibernateRealworldRelations.realworldRelations.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 @Builder
@@ -18,16 +20,25 @@ public class Tag {
     @Column(name = "tag_id")
     private Long id;
     private String name;
-    @ManyToOne
-    @JoinColumn(name="article_id")
-    private Article article;
+//    @ManyToOne
+//    @JoinColumn(name="article_id")
+//    private Article article;
+
+    @Builder.Default
+    @ManyToMany(mappedBy = "tagList")
+    private Set<Article> articles = new HashSet<>();
+
+    public Tag(String name) {
+        this.name = name;
+        this.articles = new HashSet<>();
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tag tag = (Tag) o;
-        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name) && Objects.equals(article, tag.article);
+        return Objects.equals(id, tag.id) && Objects.equals(name, tag.name) && Objects.equals(articles, tag.articles);
     }
 
     @Override

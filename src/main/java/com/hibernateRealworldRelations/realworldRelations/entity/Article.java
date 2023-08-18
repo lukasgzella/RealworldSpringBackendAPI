@@ -27,8 +27,17 @@ public class Article {
     private Set<User> followingUsers = new HashSet<>();
     @OneToMany(mappedBy = "article")
     private List<Comment> comments;
+//    @Builder.Default
+//    @OneToMany(mappedBy = "article")
+//    private Set<Tag> tagList = new HashSet<>();
+
     @Builder.Default
-    @OneToMany(mappedBy = "article")
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "articles_tag-list",
+            joinColumns = {@JoinColumn(name = "article_id")},
+            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
+    )
     private Set<Tag> tagList = new HashSet<>();
 
     private String title;
