@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ArticleRepository extends CrudRepository<Article, Long> {
@@ -86,4 +87,5 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             """)
     List<Article> findByFollowingUser(@Param("user_id") String user_id, Pageable pageable);
 
+    Optional<Article> findByTitle(String title);
 }

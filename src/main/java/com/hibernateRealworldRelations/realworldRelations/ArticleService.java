@@ -1,7 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
-import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
@@ -10,13 +9,9 @@ import com.hibernateRealworldRelations.realworldRelations.repository.UserReposit
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -188,7 +183,6 @@ public class ArticleService {
                 .title(title)
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
-        // optional
         Set<Tag> existingTags = stringList
                 .stream()
                 .map(s -> tagRepository.findByName(s)
@@ -198,5 +192,16 @@ public class ArticleService {
         existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());
         savedArticle.setTagList(existingTags);
         articleRepository.save(savedArticle);
+    }
+
+    public void getArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Title? ");
+        String title = scanner.nextLine();
+        Article article = articleRepository.findByTitle(title).orElseThrow();
+        System.out.println("Article{" +
+                "id=" + article.getId() +
+                "title=" + article.getTitle()
+        );
     }
 }

@@ -38,6 +38,10 @@ public class ArticleController {
                     articleService.createArticle();
                     break;
                 }
+                case "4": {
+                    articleService.getArticle();
+                    break;
+                }
                 case "e":
                     break LOOP;
             }
