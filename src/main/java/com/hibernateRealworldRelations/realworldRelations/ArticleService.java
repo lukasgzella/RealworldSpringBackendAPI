@@ -204,4 +204,11 @@ public class ArticleService {
                 "title=" + article.getTitle()
         );
     }
+
+    public void updateArticle() {
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Enter slug? PUT /api/articles/:slug");
+//        String title = scanner.nextLine().replace('-',' ');
+//        articleRepository.findByTitle(title);
+    }
 }

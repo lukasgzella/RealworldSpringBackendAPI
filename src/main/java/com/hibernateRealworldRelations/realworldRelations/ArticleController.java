@@ -42,6 +42,10 @@ public class ArticleController {
                     articleService.getArticle();
                     break;
                 }
+                case "5": {
+                    articleService.updateArticle();
+                    break;
+                }
                 case "e":
                     break LOOP;
             }

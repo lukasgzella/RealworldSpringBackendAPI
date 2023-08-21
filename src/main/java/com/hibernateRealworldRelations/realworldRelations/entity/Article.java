@@ -27,9 +27,6 @@ public class Article {
     private Set<User> followingUsers = new HashSet<>();
     @OneToMany(mappedBy = "article")
     private List<Comment> comments;
-//    @Builder.Default
-//    @OneToMany(mappedBy = "article")
-//    private Set<Tag> tagList = new HashSet<>();
 
     @Builder.Default
     @ManyToMany(cascade = {CascadeType.ALL})
@@ -41,6 +38,18 @@ public class Article {
     private Set<Tag> tagList = new HashSet<>();
 
     private String title;
+    private String slug;
+
+    @Builder
+    public Article(Long id, User author, Set<User> followingUsers, List<Comment> comments, Set<Tag> tagList, String title) {
+        this.id = id;
+        this.author = author;
+        this.followingUsers = followingUsers;
+        this.comments = comments;
+        this.tagList = tagList;
+        this.title = title;
+        this.slug = title.toLowerCase().replace(' ','-');
+    }
 
     @Override
     public String toString() {
