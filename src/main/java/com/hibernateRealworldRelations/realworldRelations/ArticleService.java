@@ -271,4 +271,15 @@ public class ArticleService {
         System.out.println("comment with article_id: " + article.getId() + " added to repository");
         System.out.println(comment);
     }
+
+    public void getCommentsFromAnArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? GET /api/articles/:slug/comments");
+        String slug = scanner.nextLine();
+        Article article = articleRepository.findBySlugWithComments(slug).orElseThrow();
+        List<Comment> comments = article.getComments();
+        comments.forEach(c -> System.out.println("Comment{" +
+                "body=" + c.getBody()
+        ));
+    }
 }

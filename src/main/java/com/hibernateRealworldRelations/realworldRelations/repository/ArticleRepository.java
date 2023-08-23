@@ -89,4 +89,11 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
 
     Optional<Article> findBySlug(String slug);
 
+    @Query("""
+            SELECT a FROM Article a 
+            LEFT JOIN FETCH a.comments
+            WHERE (a.slug = :slug) 
+            """)
+    Optional<Article> findBySlugWithComments(@Param("slug") String slug);
+
 }

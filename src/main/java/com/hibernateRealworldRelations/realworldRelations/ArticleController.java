@@ -22,7 +22,8 @@ public class ArticleController {
             System.out.println("4 - getArticle");
             System.out.println("5 - updateArticle");
             System.out.println("6 - deleteArticle");
-            System.out.println("7 - addCommentsToAnArticle");
+            System.out.println("7 - addCommentToAnArticle");
+            System.out.println("8 - getCommentsFromAnArticle");
 
             System.out.println("e - exit");
 
@@ -53,6 +54,10 @@ public class ArticleController {
                 }
                 case "7": {
                     articleService.addCommentsToAnArticle();
+                    break;
+                }
+                case "8": {
+                    articleService.getCommentsFromAnArticle();
                     break;
                 }
                 case "e":
