@@ -1,15 +1,18 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.CommentRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.TagRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +24,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final CommentRepository commentRepository;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -237,5 +241,34 @@ public class ArticleService {
                 ", title=" + article.getTitle() +
                 ", slug=" + article.getSlug() +
                 '}');
+    }
+
+    @Transactional
+    public void addCommentsToAnArticle() {
+        // in spec request body with Comment
+        // Auth required
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? POST /api/articles/:slug/comments");
+        String slug = scanner.nextLine();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        System.out.println("Enter authenticated userId:");
+        int userId = Integer.parseInt(scanner.nextLine());
+        System.out.println("Enter required field: body?");
+        String body = scanner.nextLine();
+
+        User author = userRepository.findById(userId);
+        Comment comment = Comment.builder().article(article).author(author).body(body).build();
+        comment = commentRepository.save(comment);
+        List<Comment> comments = article.getComments();
+        List<Comment> userComments = author.getComments();
+        comments.add(comment);
+        userComments.add(comment);
+        article.setComments(comments);
+        author.setComments(userComments);
+
+        articleRepository.save(article);
+        userRepository.save(author);
+        System.out.println("comment with article_id: " + article.getId() + " added to repository");
+        System.out.println(comment);
     }
 }
