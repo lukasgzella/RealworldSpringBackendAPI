@@ -181,6 +181,7 @@ public class ArticleService {
         Article savedArticle = articleRepository.save(Article.builder()
                 .author(user)
                 .title(title)
+                .slug(title.toLowerCase().replace(' ','-'))
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
         Set<Tag> existingTags = stringList
@@ -196,19 +197,32 @@ public class ArticleService {
 
     public void getArticle() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Title? ");
-        String title = scanner.nextLine();
-        Article article = articleRepository.findByTitle(title).orElseThrow();
+        System.out.println("Enter slug? GET /api/articles/:slug");
+        String slug = scanner.nextLine();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
         System.out.println("Article{" +
                 "id=" + article.getId() +
-                "title=" + article.getTitle()
-        );
+                ", title=" + article.getTitle() +
+                ", slug=" + article.getSlug() +
+                '}');
     }
 
     public void updateArticle() {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Enter slug? PUT /api/articles/:slug");
-//        String title = scanner.nextLine().replace('-',' ');
-//        articleRepository.findByTitle(title);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? PUT /api/articles/:slug");
+        String slug = scanner.nextLine();
+        Article articleToUpdate = articleRepository.findBySlug(slug).orElseThrow();
+        System.out.println("Enter title to change?");
+        // in spec optional title, description or body
+        String title = scanner.nextLine();
+        articleToUpdate.setTitle(title);
+        // DRY principle violation
+        articleToUpdate.setSlug(title.toLowerCase().replace(' ','-'));
+        articleToUpdate = articleRepository.save(articleToUpdate);
+        System.out.println("Article{" +
+                "id=" + articleToUpdate.getId() +
+                ", title=" + articleToUpdate.getTitle() +
+                ", slug=" + articleToUpdate.getSlug() +
+                '}');
     }
 }

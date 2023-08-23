@@ -87,5 +87,5 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             """)
     List<Article> findByFollowingUser(@Param("user_id") String user_id, Pageable pageable);
 
-    Optional<Article> findByTitle(String title);
+    Optional<Article> findBySlug(String slug);
 }
