@@ -211,18 +211,31 @@ public class ArticleService {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter slug? PUT /api/articles/:slug");
         String slug = scanner.nextLine();
-        Article articleToUpdate = articleRepository.findBySlug(slug).orElseThrow();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
         System.out.println("Enter title to change?");
         // in spec optional title, description or body
         String title = scanner.nextLine();
-        articleToUpdate.setTitle(title);
+        article.setTitle(title);
         // DRY principle violation
-        articleToUpdate.setSlug(title.toLowerCase().replace(' ','-'));
-        articleToUpdate = articleRepository.save(articleToUpdate);
+        article.setSlug(title.toLowerCase().replace(' ','-'));
+        article = articleRepository.save(article);
         System.out.println("Article{" +
-                "id=" + articleToUpdate.getId() +
-                ", title=" + articleToUpdate.getTitle() +
-                ", slug=" + articleToUpdate.getSlug() +
+                "id=" + article.getId() +
+                ", title=" + article.getTitle() +
+                ", slug=" + article.getSlug() +
+                '}');
+    }
+
+    public void deleteArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? DELETE /api/articles/:slug");
+        String slug = scanner.nextLine();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        articleRepository.delete(article);
+        System.out.println("Deleted article{" +
+                "id=" + article.getId() +
+                ", title=" + article.getTitle() +
+                ", slug=" + article.getSlug() +
                 '}');
     }
 }
