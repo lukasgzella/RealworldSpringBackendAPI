@@ -279,7 +279,33 @@ public class ArticleService {
         Article article = articleRepository.findBySlugWithComments(slug).orElseThrow();
         List<Comment> comments = article.getComments();
         comments.forEach(c -> System.out.println("Comment{" +
+                "comment_id=" + c.getId() +
                 "body=" + c.getBody()
         ));
+    }
+
+    @Transactional
+    public void deleteComment() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? DELETE /api/articles/:slug/comments/:id");
+        String slug = scanner.nextLine();
+        System.out.println("Enter comment_id? ");
+        long commentId = Integer.parseInt(scanner.nextLine());
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        User author = userRepository.findById(comment.getAuthor().getId()).orElseThrow();
+
+        // todo check if authenticated user is author of a comment, otherwise do nothing
+        List<Comment> comments = article.getComments();
+        List<Comment> userComments = author.getComments();
+        comments.remove(comment);
+        userComments.remove(comment);
+        article.setComments(comments);
+        author.setComments(userComments);
+
+        articleRepository.save(article);
+        userRepository.save(author);
+        commentRepository.delete(comment);
+        System.out.println("comment deleted");
     }
 }

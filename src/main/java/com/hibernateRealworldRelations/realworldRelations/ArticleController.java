@@ -24,6 +24,7 @@ public class ArticleController {
             System.out.println("6 - deleteArticle");
             System.out.println("7 - addCommentToAnArticle");
             System.out.println("8 - getCommentsFromAnArticle");
+            System.out.println("9 - deleteComment");
 
             System.out.println("e - exit");
 
@@ -58,6 +59,10 @@ public class ArticleController {
                 }
                 case "8": {
                     articleService.getCommentsFromAnArticle();
+                    break;
+                }
+                case "9": {
+                    articleService.deleteComment();
                     break;
                 }
                 case "e":
