@@ -26,6 +26,7 @@ public class ArticleController {
             System.out.println("8 - getCommentsFromAnArticle");
             System.out.println("9 - deleteComment");
             System.out.println("10 - favoriteArticle");
+            System.out.println("11 - unfavoriteArticle");
 
             System.out.println("e - exit");
 
@@ -68,6 +69,10 @@ public class ArticleController {
                 }
                 case "10": {
                     articleService.favoriteArticle();
+                    break;
+                }
+                case "11": {
+                    articleService.unfavoriteArticle();
                     break;
                 }
                 case "e":

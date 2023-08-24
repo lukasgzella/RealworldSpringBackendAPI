@@ -315,7 +315,7 @@ public class ArticleService {
         System.out.println("Enter slug? POST /api/articles/:slug/favorite");
         String slug = scanner.nextLine();
         // auth required and no additional parameters required
-        System.out.println("Enter authenticated userId:");
+        System.out.println("Enter userId (user who like article):");
         int userId = Integer.parseInt(scanner.nextLine());
         User user = userRepository.findById(userId);
         Article article = articleRepository.findBySlug(slug).orElseThrow();
@@ -331,5 +331,29 @@ public class ArticleService {
         userRepository.save(user);
         System.out.println("Article id: " + article.getId() + " with following users: " + article.getFollowingUsers().toString());
         System.out.println("User id: " + user.getId() + " with favoriteArticles: " + user.getFavoriteArticles().toString());
+    }
+
+    @Transactional
+    public void unfavoriteArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? /api/articles/:slug/favorite");
+        String slug = scanner.nextLine();
+        // auth required and no additional parameters required
+        System.out.println("Enter userId(to unlike article):");
+        int userId = Integer.parseInt(scanner.nextLine());
+        User user = userRepository.findById(userId);
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+
+        Set<Article> favoritesArticles = user.getFavoriteArticles();
+        Set<User> followingUsers = article.getFollowingUsers();
+        favoritesArticles.remove(article);
+        followingUsers.remove(user);
+        article.setFollowingUsers(followingUsers);
+        user.setFavoriteArticles(favoritesArticles);
+
+        article = articleRepository.save(article);
+        userRepository.save(user);
+        System.out.println("ArticleId: " + article.getId() +" with following users: (user deleted) " + article.getFollowingUsers().toString());
+        System.out.println("Article with id has been removed from your favorites: " + user.getFavoriteArticles().toString());
     }
 }
