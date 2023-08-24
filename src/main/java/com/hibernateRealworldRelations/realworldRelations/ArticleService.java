@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -355,5 +356,13 @@ public class ArticleService {
         userRepository.save(user);
         System.out.println("ArticleId: " + article.getId() +" with following users: (user deleted) " + article.getFollowingUsers().toString());
         System.out.println("Article with id has been removed from your favorites: " + user.getFavoriteArticles().toString());
+    }
+
+    public void getTags() {
+        Iterable<Tag> tags = tagRepository.findAll();
+        List<Tag> tagList =
+                StreamSupport.stream(tags.spliterator(), false)
+                        .toList();
+       tagList.forEach(tag -> System.out.println(tag.getName()));
     }
 }
