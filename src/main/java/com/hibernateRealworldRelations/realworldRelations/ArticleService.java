@@ -308,4 +308,28 @@ public class ArticleService {
         commentRepository.delete(comment);
         System.out.println("comment deleted");
     }
+
+    @Transactional
+    public void favoriteArticle() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter slug? POST /api/articles/:slug/favorite");
+        String slug = scanner.nextLine();
+        // auth required and no additional parameters required
+        System.out.println("Enter authenticated userId:");
+        int userId = Integer.parseInt(scanner.nextLine());
+        User user = userRepository.findById(userId);
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+
+        Set<Article> favoritesArticles = user.getFavoriteArticles();
+        Set<User> followingUsers = article.getFollowingUsers();
+        favoritesArticles.add(article);
+        followingUsers.add(user);
+        article.setFollowingUsers(followingUsers);
+        user.setFavoriteArticles(favoritesArticles);
+
+        article = articleRepository.save(article);
+        userRepository.save(user);
+        System.out.println("Article id: " + article.getId() + " with following users: " + article.getFollowingUsers().toString());
+        System.out.println("User id: " + user.getId() + " with favoriteArticles: " + user.getFavoriteArticles().toString());
+    }
 }
