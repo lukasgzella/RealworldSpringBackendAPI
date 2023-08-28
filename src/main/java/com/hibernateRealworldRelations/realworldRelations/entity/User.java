@@ -21,13 +21,19 @@ public class User {
     @Id
     @GeneratedValue
     private Long id;
+    private String email;
+    private String password;
     private String username;
+    private String bio;
+    private String image;
     @OneToMany(mappedBy = "to")
     private Set<Follower> followers;
     @OneToMany(mappedBy = "from")
     private Set<Follower> following;
     @OneToMany(mappedBy = "author")
     private List<Article> articles;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
             name = "following-users_favorite-articles",

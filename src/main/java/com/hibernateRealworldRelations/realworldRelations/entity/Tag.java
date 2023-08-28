@@ -20,10 +20,6 @@ public class Tag {
     @Column(name = "tag_id")
     private Long id;
     private String name;
-//    @ManyToOne
-//    @JoinColumn(name="article_id")
-//    private Article article;
-
     @Builder.Default
     @ManyToMany(mappedBy = "tagList")
     private Set<Article> articles = new HashSet<>();

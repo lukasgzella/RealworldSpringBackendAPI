@@ -37,6 +37,10 @@ public class Article {
     )
     private Set<Tag> tagList = new HashSet<>();
 
+    private String description;
+    private String body;
+    private String createdAt;
+    private String updatedAt;
     private String title;
     private String slug;
 
