@@ -139,4 +139,9 @@ public class CommonService {
         addArticleByUserId(9); // article_id = 9
         addArticleByUserId(10); // article_id = 10
     }
+
+    public void findFollowers(String from, String to) {
+        Follower follower = followerRepository.findByFromTo(from,to).orElseThrow();
+        System.out.println(follower);
+    }
 }

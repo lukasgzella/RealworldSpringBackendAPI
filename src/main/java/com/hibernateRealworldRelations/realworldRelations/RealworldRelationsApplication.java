@@ -32,6 +32,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("7 - make article favorite");
 			System.out.println("8 - add tag to article");
 			System.out.println("9 - go to Article Controller");
+			System.out.println("10 - find followers by usernames");
 			System.out.println("art - add test users with articles");
 			System.out.println("tgs - add test tags");
 			System.out.println("fav - add test favorites");
@@ -98,6 +99,15 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 				case "9":	{
 					System.out.println("---> go to articleController...");
 					articleController.chooseAction();
+					break;
+				}
+				case "10":	{
+					System.out.println("find followers");
+					System.out.println("Enter username FROM: ");
+					String from = scanner.nextLine();
+					System.out.println("Enter username TO: ");
+					String to = scanner.nextLine();
+					service.findFollowers(from, to);
 					break;
 				}
 				case "art":	{
