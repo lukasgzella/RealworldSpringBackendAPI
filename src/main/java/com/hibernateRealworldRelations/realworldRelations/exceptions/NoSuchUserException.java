@@ -1,5 +1,5 @@
 package com.hibernateRealworldRelations.realworldRelations.exceptions;
 
-public class NoSuchUserException extends RuntimeException{
+public class NoSuchUserException extends Throwable{
 
 }

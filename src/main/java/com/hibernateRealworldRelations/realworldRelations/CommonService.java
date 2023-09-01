@@ -1,6 +1,7 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.*;
+import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -141,7 +142,15 @@ public class CommonService {
     }
 
     public void findFollowers(String from, String to) {
-        Follower follower = followerRepository.findByFromTo(from,to).orElseThrow();
+        boolean isFollowing = followerRepository.existsByFromTo(from, to);
+        System.out.println("existsBy method resulting: " + isFollowing);
+        Follower follower = null;
+        try {
+            follower = followerRepository.findByFromTo(from, to)
+                    .orElseThrow(NoSuchUserException::new);
+        } catch (NoSuchUserException e) {
+            System.out.println("is following: false");
+        }
         System.out.println(follower);
     }
 }
