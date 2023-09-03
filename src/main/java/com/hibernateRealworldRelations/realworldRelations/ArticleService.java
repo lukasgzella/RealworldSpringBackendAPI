@@ -1,13 +1,9 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
-import com.hibernateRealworldRelations.realworldRelations.entity.Article;
-import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
-import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
-import com.hibernateRealworldRelations.realworldRelations.entity.User;
-import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.CommentRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.TagRepository;
-import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
+import com.hibernateRealworldRelations.realworldRelations.dto.ArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.Author;
+import com.hibernateRealworldRelations.realworldRelations.entity.*;
+import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +22,7 @@ public class ArticleService {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
+    private final FollowerRepository followerRepository;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -186,7 +183,7 @@ public class ArticleService {
         Article savedArticle = articleRepository.save(Article.builder()
                 .author(user)
                 .title(title)
-                .slug(title.toLowerCase().replace(' ','-'))
+                .slug(title.toLowerCase().replace(' ', '-'))
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
         Set<Tag> existingTags = stringList
@@ -200,16 +197,43 @@ public class ArticleService {
         articleRepository.save(savedArticle);
     }
 
+    @Transactional
     public void getArticle() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter slug? GET /api/articles/:slug");
         String slug = scanner.nextLine();
         Article article = articleRepository.findBySlug(slug).orElseThrow();
+        User authenticated = checkIfAuthenticated();
+        boolean favorited = false;
+        boolean following = false;
+        if (authenticated != null) {
+            favorited = isFavorited(article, authenticated);
+            following = isFollowing(authenticated, article.getAuthor());
+        }
         System.out.println("Article{" +
                 "id=" + article.getId() +
                 ", title=" + article.getTitle() +
                 ", slug=" + article.getSlug() +
                 '}');
+        // instead of printing, need to apply mapping to DTOs: ArticleResponse and Author
+        ArticleResponse res = ArticleResponse.builder()
+                .slug(article.getSlug())
+                .title(article.getTitle())
+                .description(article.getDescription())
+                .body(article.getBody())
+                .tagList(article.getTagList().stream().map(Tag::getName).toList())
+                .createdAt(article.getCreatedAt())
+                .updatedAt(article.getUpdatedAt())
+                .favorited(favorited)
+                .favoritesCount(article.getFollowingUsers().size()) // followingUsers Hashset.size()
+                .author(new Author(
+                        article.getAuthor().getUsername(),
+                        article.getAuthor().getBio(),
+                        article.getAuthor().getImage(),
+                        following
+                ))
+                .build();
+        System.out.println(res);
     }
 
     public void updateArticle() {
@@ -222,7 +246,7 @@ public class ArticleService {
         String title = scanner.nextLine();
         article.setTitle(title);
         // DRY principle violation
-        article.setSlug(title.toLowerCase().replace(' ','-'));
+        article.setSlug(title.toLowerCase().replace(' ', '-'));
         article = articleRepository.save(article);
         System.out.println("Article{" +
                 "id=" + article.getId() +
@@ -354,7 +378,7 @@ public class ArticleService {
 
         article = articleRepository.save(article);
         userRepository.save(user);
-        System.out.println("ArticleId: " + article.getId() +" with following users: (user deleted) " + article.getFollowingUsers().toString());
+        System.out.println("ArticleId: " + article.getId() + " with following users: (user deleted) " + article.getFollowingUsers().toString());
         System.out.println("Article with id has been removed from your favorites: " + user.getFavoriteArticles().toString());
     }
 
@@ -363,6 +387,25 @@ public class ArticleService {
         List<Tag> tagList =
                 StreamSupport.stream(tags.spliterator(), false)
                         .toList();
-       tagList.forEach(tag -> System.out.println(tag.getName()));
+        tagList.forEach(tag -> System.out.println(tag.getName()));
+    }
+
+    private User checkIfAuthenticated() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("authenticated? y/n");
+        if (scanner.nextLine().equals("y")) {
+            System.out.println("Enter userId?");
+            String userId = scanner.nextLine();
+            return userRepository.findById(Long.parseLong(userId));
+        }
+        return null;
+    }
+
+    private boolean isFavorited(Article article, User authenticated) {
+        return authenticated.getFavoriteArticles().contains(article);
+    }
+
+    private boolean isFollowing(User userFrom, User userTo) {
+        return followerRepository.existsByFromTo(userFrom.getUsername(), userTo.getUsername());
     }
 }
