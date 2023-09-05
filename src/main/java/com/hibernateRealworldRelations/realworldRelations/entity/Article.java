@@ -44,6 +44,9 @@ public class Article {
     private String title;
     private String slug;
 
+    private boolean favorited = false;
+    private boolean following = false;
+
     @Builder
     public Article(Long id, User author, Set<User> followingUsers, List<Comment> comments, Set<Tag> tagList, String title) {
         this.id = id;

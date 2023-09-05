@@ -1,7 +1,9 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
 import com.hibernateRealworldRelations.realworldRelations.dto.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.Author;
+import com.hibernateRealworldRelations.realworldRelations.dto.MultipleArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.*;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -126,6 +128,9 @@ public class ArticleService {
                 "id=" + article.getId() +
                 "articlesCount=" + articlesCount
         ));
+        // todo map to MultipleArticleResponse
+//        List<ArticleResponse> articles = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
+//        return new MultipleArticleResponse(articles, articlesCount);
     }
 
     private void getArticleListByManyParams(String author, String tag, String name) {
@@ -210,29 +215,10 @@ public class ArticleService {
             favorited = isFavorited(article, authenticated);
             following = isFollowing(authenticated, article.getAuthor());
         }
-        System.out.println("Article{" +
-                "id=" + article.getId() +
-                ", title=" + article.getTitle() +
-                ", slug=" + article.getSlug() +
-                '}');
+        article.setFavorited(favorited);
+        article.setFollowing(following);
         // instead of printing, need to apply mapping to DTOs: ArticleResponse and Author
-        ArticleResponse res = ArticleResponse.builder()
-                .slug(article.getSlug())
-                .title(article.getTitle())
-                .description(article.getDescription())
-                .body(article.getBody())
-                .tagList(article.getTagList().stream().map(Tag::getName).toList())
-                .createdAt(article.getCreatedAt())
-                .updatedAt(article.getUpdatedAt())
-                .favorited(favorited)
-                .favoritesCount(article.getFollowingUsers().size()) // followingUsers Hashset.size()
-                .author(new Author(
-                        article.getAuthor().getUsername(),
-                        article.getAuthor().getBio(),
-                        article.getAuthor().getImage(),
-                        following
-                ))
-                .build();
+        ArticleResponse res = new ArticleResponseMapper().apply(article);
         System.out.println(res);
     }
 
