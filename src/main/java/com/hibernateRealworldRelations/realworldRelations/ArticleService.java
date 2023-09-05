@@ -121,16 +121,17 @@ public class ArticleService {
 
     }
 
+
     private void getArticlePageByManyParams(String author, String tag, String name, int limit, int offset) {
         Page<Article> page = articleRepository.findArticlesByParamsPage(author, tag, name, PageRequest.of(offset, limit));
-        long articlesCount = page.getTotalElements();
+        long articlesCount = articleRepository.countArticlesByParams(author, tag, name);
         page.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId() +
                 "articlesCount=" + articlesCount
         ));
-        // todo map to MultipleArticleResponse
-//        List<ArticleResponse> articles = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
-//        return new MultipleArticleResponse(articles, articlesCount);
+        List<ArticleResponse> articles = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
+        var multi = new MultipleArticleResponse(articles, articlesCount);
+        System.out.println(multi);
     }
 
     private void getArticleListByManyParams(String author, String tag, String name) {

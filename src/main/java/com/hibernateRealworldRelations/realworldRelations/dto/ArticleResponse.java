@@ -24,4 +24,19 @@ public class ArticleResponse {
     private int favoritesCount;
     private Author author;
 
+    @Override
+    public String toString() {
+        return "ArticleResponse{" +
+                "slug='" + slug + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", body='" + body + '\'' +
+                ", tagList=" + tagList +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", favorited=" + favorited +
+                ", favoritesCount=" + favoritesCount +
+                ", author=" + author +
+                '}';
+    }
 }

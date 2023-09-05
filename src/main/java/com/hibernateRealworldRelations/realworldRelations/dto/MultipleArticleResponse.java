@@ -10,4 +10,11 @@ public class MultipleArticleResponse {
     private List<ArticleResponse> articles;
     private long articlesCount;
 
+    @Override
+    public String toString() {
+        return "MultipleArticleResponse{" +
+                "articles=" + articles.toString() +
+                ", articlesCount=" + articlesCount +
+                '}';
+    }
 }

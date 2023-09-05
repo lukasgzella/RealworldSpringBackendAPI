@@ -71,6 +71,8 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
     );
     @Query("""
             SELECT a FROM Article a
+            LEFT JOIN FETCH a.tagList
+            LEFT JOIN FETCH a.followingUsers
             WHERE (:author IS NULL OR a.author.username = :author)
             AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
             AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
@@ -80,6 +82,17 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             @Param("tag") String tag,
             @Param("favorited") String favorited,
             Pageable pageable
+    );
+    @Query("""
+            SELECT COUNT(*) a FROM Article a
+            WHERE (:author IS NULL OR a.author.username = :author)
+            AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
+            AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            """)
+    long countArticlesByParams(
+            @Param("author") String author,
+            @Param("tag") String tag,
+            @Param("favorited") String favorited
     );
     @Query("""
             SELECT a FROM Article a
