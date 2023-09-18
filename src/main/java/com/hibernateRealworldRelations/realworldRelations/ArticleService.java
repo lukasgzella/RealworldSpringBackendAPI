@@ -107,6 +107,7 @@ public class ArticleService {
     }
 
     public void feedArticles() {
+//  Authentication required, will return multiple articles created by followed users, ordered by most recent first.
         Scanner scanner = new Scanner(System.in);
         System.out.println("Limit? ");
         int limit = Integer.parseInt(scanner.nextLine());
@@ -118,7 +119,12 @@ public class ArticleService {
         articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId()
         ));
-
+        List<ArticleResponse> articleResponses = articles.stream().
+                map(article -> new ArticleResponseMapper()
+                        .apply(article))
+                .toList();
+        var multi = new MultipleArticleResponse(articleResponses, articles.size());
+        System.out.println(multi);
     }
 
 
