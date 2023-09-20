@@ -185,10 +185,10 @@ public class ArticleService {
         User user = userRepository.findById(Long.parseLong(userId));
         System.out.println("title?");
         String title = scanner.nextLine();
-        // in spec: title, description, body, optional taglist
-        // description, body omitted for shortening
-
-        // get tag names from user
+        System.out.println("description?");
+        String description = scanner.nextLine();
+        System.out.println("body?");
+        String body = scanner.nextLine();
         System.out.println("taglist? Enter tags separated by spaces");
         List<String> stringList = Arrays.stream(scanner.nextLine().split("\s")).toList();
         // create new article with id
@@ -196,6 +196,8 @@ public class ArticleService {
                 .author(user)
                 .title(title)
                 .slug(title.toLowerCase().replace(' ', '-'))
+                .description(description)
+                .body(body)
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
         Set<Tag> existingTags = stringList
@@ -205,8 +207,11 @@ public class ArticleService {
         // update tags with savedArticle
         existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
         existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());
+
         savedArticle.setTagList(existingTags);
         articleRepository.save(savedArticle);
+        ArticleResponse res = new ArticleResponseMapper().apply(savedArticle);
+        System.out.println(res);
     }
 
     @Transactional
