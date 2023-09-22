@@ -235,6 +235,7 @@ public class ArticleService {
     }
 
     public void updateArticle() {
+//        Authentication required, returns the updated Article
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter slug? PUT /api/articles/:slug");
         String slug = scanner.nextLine();
@@ -246,11 +247,8 @@ public class ArticleService {
         // DRY principle violation
         article.setSlug(title.toLowerCase().replace(' ', '-'));
         article = articleRepository.save(article);
-        System.out.println("Article{" +
-                "id=" + article.getId() +
-                ", title=" + article.getTitle() +
-                ", slug=" + article.getSlug() +
-                '}');
+        ArticleResponse res = new ArticleResponseMapper().apply(article);
+        System.out.println(res);
     }
 
     public void deleteArticle() {
