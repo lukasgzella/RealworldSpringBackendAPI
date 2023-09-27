@@ -289,7 +289,6 @@ public class ArticleService {
 
         articleRepository.save(article);
         userRepository.save(author);
-        System.out.println("comment with article_id: " + article.getId() + " added to repository");
         System.out.println(comment);
     }
 
