@@ -289,7 +289,11 @@ public class ArticleService {
 
         articleRepository.save(article);
         userRepository.save(author);
+
         System.out.println(comment);
+
+
+
     }
 
     public void getCommentsFromAnArticle() {
