@@ -17,4 +17,14 @@ public class CommentResponse {
     private String body;
     private Author author;
 
+    @Override
+    public String toString() {
+        return "CommentResponse{" +
+                "id=" + id +
+                ", createdAt='" + createdAt + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                ", body='" + body + '\'' +
+                ", author=" + author +
+                '}';
+    }
 }

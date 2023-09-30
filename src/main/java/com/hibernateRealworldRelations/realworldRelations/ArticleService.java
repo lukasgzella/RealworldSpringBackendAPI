@@ -1,9 +1,8 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
-import com.hibernateRealworldRelations.realworldRelations.dto.ArticleResponse;
-import com.hibernateRealworldRelations.realworldRelations.dto.Author;
-import com.hibernateRealworldRelations.realworldRelations.dto.MultipleArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.CommentResponseMapper;
+import com.hibernateRealworldRelations.realworldRelations.dto.*;
 import com.hibernateRealworldRelations.realworldRelations.entity.*;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ public class ArticleService {
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
     private final FollowerRepository followerRepository;
+    private final CommentResponseMapper commentResponseMapper;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -266,6 +266,7 @@ public class ArticleService {
 
     @Transactional
     public void addCommentsToAnArticle() {
+        // todo fix isFollowing in CommentResponseMapper
         // in spec request body with Comment
         // Auth required
         Scanner scanner = new Scanner(System.in);
@@ -291,9 +292,8 @@ public class ArticleService {
         userRepository.save(author);
 
         System.out.println(comment);
-
-
-
+        CommentResponse res = commentResponseMapper.apply(comment);
+        System.out.println(res);
     }
 
     public void getCommentsFromAnArticle() {
@@ -306,6 +306,15 @@ public class ArticleService {
                 "comment_id=" + c.getId() +
                 "body=" + c.getBody()
         ));
+
+        User authenticatedUser = checkIfAuthenticated();
+        List<CommentResponse> commentResponses = comments.stream().
+                map(comment -> commentResponseMapper.apply(comment))
+                .toList();
+
+        var multi = new MultipleCommentResponse(commentResponses);
+        System.out.println(multi);
+
     }
 
     @Transactional
@@ -404,7 +413,7 @@ public class ArticleService {
         return authenticated.getFavoriteArticles().contains(article);
     }
 
-    private boolean isFollowing(User userFrom, User userTo) {
+    public boolean isFollowing(User userFrom, User userTo) {
         return followerRepository.existsByFromTo(userFrom.getUsername(), userTo.getUsername());
     }
 }
