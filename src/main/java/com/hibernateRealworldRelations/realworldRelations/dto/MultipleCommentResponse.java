@@ -12,7 +12,7 @@ public class MultipleCommentResponse {
     @Override
     public String toString() {
         return "MultipleCommentResponse{" +
-                "articles=" + comments.toString() +
+                "comments=" + comments.toString() +
                 '}';
     }
 }

@@ -3,7 +3,10 @@ package com.hibernateRealworldRelations.realworldRelations;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.CommentResponseMapper;
 import com.hibernateRealworldRelations.realworldRelations.dto.*;
-import com.hibernateRealworldRelations.realworldRelations.entity.*;
+import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
+import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
+import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +27,6 @@ public class ArticleService {
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
     private final FollowerRepository followerRepository;
-    private final CommentResponseMapper commentResponseMapper;
 
     public void getArticles() {
         Scanner scanner = new Scanner(System.in);
@@ -292,7 +294,7 @@ public class ArticleService {
         userRepository.save(author);
 
         System.out.println(comment);
-        CommentResponse res = commentResponseMapper.apply(comment);
+        CommentResponse res = new CommentResponseMapper().apply(comment);
         System.out.println(res);
     }
 
@@ -302,15 +304,25 @@ public class ArticleService {
         String slug = scanner.nextLine();
         Article article = articleRepository.findBySlugWithComments(slug).orElseThrow();
         List<Comment> comments = article.getComments();
-        comments.forEach(c -> System.out.println("Comment{" +
-                "comment_id=" + c.getId() +
-                "body=" + c.getBody()
-        ));
 
-        User authenticatedUser = checkIfAuthenticated();
-        List<CommentResponse> commentResponses = comments.stream().
-                map(comment -> commentResponseMapper.apply(comment))
-                .toList();
+
+        List<CommentResponse> commentResponses = new ArrayList<>();
+
+        User authenticated = checkIfAuthenticated();
+        if (authenticated == null) {
+            commentResponses = comments.stream()
+                    .map(c -> new CommentResponseMapper().apply(c))
+                    .toList();
+        } else {
+            for (Comment comment : comments) {
+                boolean isFollowing = isFollowing(authenticated, comment.getAuthor());
+                CommentResponse commentResponse = new CommentResponseMapper().apply(comment);
+                Author author = commentResponse.getAuthor();
+                author.setFollowing(isFollowing);
+                commentResponse.setAuthor(author);
+                commentResponses.add(commentResponse);
+            }
+        }
 
         var multi = new MultipleCommentResponse(commentResponses);
         System.out.println(multi);
@@ -413,7 +425,7 @@ public class ArticleService {
         return authenticated.getFavoriteArticles().contains(article);
     }
 
-    public boolean isFollowing(User userFrom, User userTo) {
+    private boolean isFollowing(User userFrom, User userTo) {
         return followerRepository.existsByFromTo(userFrom.getUsername(), userTo.getUsername());
     }
 }
