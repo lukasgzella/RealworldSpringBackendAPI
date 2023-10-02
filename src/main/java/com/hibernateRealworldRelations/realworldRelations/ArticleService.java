@@ -340,19 +340,21 @@ public class ArticleService {
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         User author = userRepository.findById(comment.getAuthor().getId()).orElseThrow();
 
-        // todo check if authenticated user is author of a comment, otherwise do nothing
-        List<Comment> comments = article.getComments();
-        List<Comment> userComments = author.getComments();
-        comments.remove(comment);
-        userComments.remove(comment);
-        article.setComments(comments);
-        author.setComments(userComments);
+        User authenticated = checkIfAuthenticated();
+        if (authenticated != null) {
+            List<Comment> comments = article.getComments();
+            List<Comment> userComments = author.getComments();
+            comments.remove(comment);
+            userComments.remove(comment);
+            article.setComments(comments);
+            author.setComments(userComments);
 
-        articleRepository.save(article);
-        userRepository.save(author);
-        commentRepository.delete(comment);
-        System.out.println("comment deleted");
-    }
+            articleRepository.save(article);
+            userRepository.save(author);
+            commentRepository.delete(comment);
+            System.out.println("comment deleted");;
+        }
+    }return
 
     @Transactional
     public void favoriteArticle() {
