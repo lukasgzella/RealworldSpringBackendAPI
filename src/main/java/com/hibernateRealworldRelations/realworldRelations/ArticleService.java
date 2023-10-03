@@ -354,7 +354,7 @@ public class ArticleService {
             commentRepository.delete(comment);
             System.out.println("comment deleted");;
         }
-    }return
+    }
 
     @Transactional
     public void favoriteArticle() {
@@ -364,20 +364,20 @@ public class ArticleService {
         // auth required and no additional parameters required
         System.out.println("Enter userId (user who like article):");
         int userId = Integer.parseInt(scanner.nextLine());
-        User user = userRepository.findById(userId);
+        User authenticated = userRepository.findById(userId);
         Article article = articleRepository.findBySlug(slug).orElseThrow();
 
-        Set<Article> favoritesArticles = user.getFavoriteArticles();
+        Set<Article> favoritesArticles = authenticated.getFavoriteArticles();
         Set<User> followingUsers = article.getFollowingUsers();
         favoritesArticles.add(article);
-        followingUsers.add(user);
+        followingUsers.add(authenticated);
         article.setFollowingUsers(followingUsers);
-        user.setFavoriteArticles(favoritesArticles);
+        authenticated.setFavoriteArticles(favoritesArticles);
 
         article = articleRepository.save(article);
-        userRepository.save(user);
-        System.out.println("Article id: " + article.getId() + " with following users: " + article.getFollowingUsers().toString());
-        System.out.println("User id: " + user.getId() + " with favoriteArticles: " + user.getFavoriteArticles().toString());
+        userRepository.save(authenticated);
+        ArticleResponse res = new ArticleResponseMapper().apply(article);
+        System.out.println(res);
     }
 
     @Transactional
@@ -400,16 +400,17 @@ public class ArticleService {
 
         article = articleRepository.save(article);
         userRepository.save(user);
-        System.out.println("ArticleId: " + article.getId() + " with following users: (user deleted) " + article.getFollowingUsers().toString());
-        System.out.println("Article with id has been removed from your favorites: " + user.getFavoriteArticles().toString());
+
+        ArticleResponse res = new ArticleResponseMapper().apply(article);
+        System.out.println(res);
     }
 
     public void getTags() {
         Iterable<Tag> tags = tagRepository.findAll();
-        List<Tag> tagList =
-                StreamSupport.stream(tags.spliterator(), false)
-                        .toList();
-        tagList.forEach(tag -> System.out.println(tag.getName()));
+        List<String> tagList = StreamSupport.stream(tags.spliterator(), false)
+                .map(Tag::getName).toList();
+        MultipleTagResponse multi = new MultipleTagResponse(tagList);
+        System.out.println(multi);
     }
 
     private User checkIfAuthenticated() {
