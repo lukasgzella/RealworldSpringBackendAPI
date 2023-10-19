@@ -108,6 +108,7 @@ public class ArticleService {
         }
     }
 
+    @Transactional
     public void feedArticles() {
 //  Authentication required, will return multiple articles created by followed users, ordered by most recent first.
         Scanner scanner = new Scanner(System.in);
@@ -117,7 +118,7 @@ public class ArticleService {
         int offset = Integer.parseInt(scanner.nextLine());
         System.out.println("Current user_id? ");
         String user_id = scanner.nextLine();
-        List<Article> articles = articleRepository.findByFollowingUser(user_id, PageRequest.of(offset, limit));
+        Page<Article> articles = articleRepository.findArticlesFromFavoritesUsers(user_id, PageRequest.of(offset, limit));
         articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId()
         ));
@@ -125,7 +126,8 @@ public class ArticleService {
                 map(article -> new ArticleResponseMapper()
                         .apply(article))
                 .toList();
-        var multi = new MultipleArticleResponse(articleResponses, articles.size());
+        long articlesCount = articleRepository.countArticlesFromFavoritesUsers(user_id);
+        var multi = new MultipleArticleResponse(articleResponses, articlesCount);
         System.out.println(multi);
     }
 
