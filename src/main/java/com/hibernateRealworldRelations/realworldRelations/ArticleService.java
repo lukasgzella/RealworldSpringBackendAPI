@@ -38,6 +38,7 @@ public class ArticleService {
             System.out.println("3 - favorited");
             System.out.println("4 - author/tag/favorited");
             System.out.println("5 - page - author/tag/favorited/limit/offset");
+            System.out.println("6 - page - author/tag/favorited/limit/offset - ordered by most recent first");
 
             System.out.println("e - exit");
 
@@ -102,10 +103,45 @@ public class ArticleService {
                     getArticlePageByManyParams(author, tag, name, limit, offset);
                     break;
                 }
+                case "6": {
+                    System.out.println("enter author name:");
+                    String author = scanner.nextLine();
+                    if (author.equals("null")) {
+                        author = null;
+                    }
+                    System.out.println("enter tag name:");
+                    String tag = scanner.nextLine();
+                    if (tag.equals("null")) {
+                        tag = null;
+                    }
+                    System.out.println("enter favorited username:");
+                    String name = scanner.nextLine();
+                    if (name.equals("null")) {
+                        name = null;
+                    }
+                    System.out.println("Limit? ");
+                    int limit = Integer.parseInt(scanner.nextLine());
+                    System.out.println("Offset? ");
+                    int offset = Integer.parseInt(scanner.nextLine());
+                    getArticlePageByManyParamsOrderedByMostRecentFirst(author, tag, name, limit, offset);
+                    break;
+                }
                 case "e":
                     break LOOP;
             }
         }
+    }
+
+    private void getArticlePageByManyParamsOrderedByMostRecentFirst(String author, String tag, String name, int limit, int offset) {
+        Page<Article> page = articleRepository.findArticlesByParamsPageOrderedByMostRecentFirst(author, tag, name, PageRequest.of(offset, limit));
+        long articlesCount = articleRepository.countArticlesByParams(author, tag, name);
+        page.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId() +
+                "articlesCount=" + articlesCount
+        ));
+        List<ArticleResponse> articles = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
+        var multi = new MultipleArticleResponse(articles, articlesCount);
+        System.out.println(multi);
     }
 
     @Transactional

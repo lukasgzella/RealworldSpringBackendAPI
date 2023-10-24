@@ -2,6 +2,7 @@ package com.hibernateRealworldRelations.realworldRelations.repository;
 
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -98,5 +99,21 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             WHERE (a.slug = :slug) 
             """)
     Optional<Article> findBySlugWithComments(@Param("slug") String slug);
+
+    @Query("""
+            SELECT a FROM Article a
+            LEFT JOIN FETCH a.tagList
+            LEFT JOIN FETCH a.followingUsers
+            WHERE (:author IS NULL OR a.author.username = :author)
+            AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
+            AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
+            ORDER BY a.createdAt
+            """)
+    Page<Article> findArticlesByParamsPageOrderedByMostRecentFirst(
+            @Param("author") String author,
+            @Param("tag") String tag,
+            @Param("favorited") String favorited,
+            Pageable pageable
+    );
 
 }
