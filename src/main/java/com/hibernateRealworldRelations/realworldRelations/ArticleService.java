@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -238,6 +239,7 @@ public class ArticleService {
                 .slug(title.toLowerCase().replace(' ', '-'))
                 .description(description)
                 .body(body)
+                .createdAt(LocalDateTime.now().toString())
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
         Set<Tag> existingTags = stringList

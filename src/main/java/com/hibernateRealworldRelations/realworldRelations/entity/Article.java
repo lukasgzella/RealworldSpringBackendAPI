@@ -19,12 +19,15 @@ public class Article {
     @GeneratedValue
     @Column(name = "article_id")
     private Long id;
+
     @ManyToOne
     @JoinColumn(name="user_id")
     private User author;
+
     @Builder.Default
     @ManyToMany(mappedBy = "favoriteArticles")
     private Set<User> followingUsers = new HashSet<>();
+
     @OneToMany(mappedBy = "article")
     private List<Comment> comments;
 
@@ -39,8 +42,10 @@ public class Article {
 
     private String description;
     private String body;
+
     private String createdAt;
     private String updatedAt;
+
     private String title;
     private String slug;
 
