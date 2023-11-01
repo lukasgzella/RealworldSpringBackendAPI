@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +48,17 @@ public class CommonService {
     @Transactional
     public void addArticleByUserId(long id) {
         User author = userRepository.findById(id);
-        Article article = Article.builder().author(author).build();
+        String title = "Title" + id;
+        String description = "Description" + id;
+        String body = "Body" + id;
+        Article article = Article.builder()
+                .author(author)
+                .title(title)
+                .slug(title.toLowerCase().replace(' ', '-'))
+                .description(description)
+                .body(body)
+                .createdAt(LocalDateTime.now().toString())
+                .build();
         article = articleRepository.save(article);
         List<Article> articles = author.getArticles();
         articles.add(article);
@@ -118,7 +129,7 @@ public class CommonService {
 //        articleRepository.save(article);
     }
 
-    public void addTestData() {
+    public void addTesUsersWithArticles() {
         addUser("john"); // user_id = 1
         addUser("mike"); // user_id = 2
         addUser("bob"); // user_id = 3
