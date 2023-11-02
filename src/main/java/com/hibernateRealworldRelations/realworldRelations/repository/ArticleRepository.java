@@ -107,7 +107,7 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             WHERE (:author IS NULL OR a.author.username = :author)
             AND (:tag IS NULL OR :tag IN (SELECT t.name FROM a.tagList t))
             AND (:favorited IS NULL OR :favorited IN (SELECT fu.username FROM a.followingUsers fu))
-            ORDER BY a.createdAt
+            ORDER BY a.createdAt DESC
             """)
     Page<Article> findArticlesByParamsPageOrderedByMostRecentFirst(
             @Param("author") String author,
