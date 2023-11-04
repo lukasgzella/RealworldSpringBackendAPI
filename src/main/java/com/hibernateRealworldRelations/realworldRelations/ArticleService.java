@@ -148,7 +148,6 @@ public class ArticleService {
     @Transactional
     public void feedArticles() {
 //  Authentication required, will return multiple articles created by followed users, ordered by most recent first.
-        // todo most recent first
         Scanner scanner = new Scanner(System.in);
         System.out.println("Limit? ");
         int limit = Integer.parseInt(scanner.nextLine());

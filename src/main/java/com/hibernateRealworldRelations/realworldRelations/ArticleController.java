@@ -18,8 +18,8 @@ public class ArticleController {
         while (true) {
             System.out.println("1 - getArticles");
             System.out.println("2 - feedArticles");
-            System.out.println("3 - createArticle");
-            System.out.println("4 - getArticle");
+            System.out.println("3 - getArticle");
+            System.out.println("4 - createArticle");
             System.out.println("5 - updateArticle");
             System.out.println("6 - deleteArticle");
             System.out.println("7 - addCommentToAnArticle");
@@ -41,11 +41,11 @@ public class ArticleController {
                     break;
                 }
                 case "3": {
-                    articleService.createArticle();
+                    articleService.getArticle();
                     break;
                 }
                 case "4": {
-                    articleService.getArticle();
+                    articleService.createArticle();
                     break;
                 }
                 case "5": {
