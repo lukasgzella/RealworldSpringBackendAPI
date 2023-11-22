@@ -1,5 +1,6 @@
-package com.hibernateRealworldRelations.realworldRelations.dto;
+package com.hibernateRealworldRelations.realworldRelations.dto.responses;
 
+import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,7 +1,7 @@
 package com.hibernateRealworldRelations.realworldRelations.auxiliary;
 
 import com.hibernateRealworldRelations.realworldRelations.dto.Author;
-import com.hibernateRealworldRelations.realworldRelations.dto.CommentResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.CommentResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 
 import java.util.function.Function;

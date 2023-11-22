@@ -3,6 +3,8 @@ package com.hibernateRealworldRelations.realworldRelations;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.CommentResponseMapper;
 import com.hibernateRealworldRelations.realworldRelations.dto.*;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.*;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
@@ -220,32 +222,50 @@ public class ArticleService {
     }
 
     public void createArticle() {
+        //auth required
         Scanner scanner = new Scanner(System.in);
         System.out.println("Current user_id? ");
         String userId = scanner.nextLine();
         User user = userRepository.findById(Long.parseLong(userId));
-        System.out.println("title?");
+
+        //article creation request - retrieving data from user
+        System.out.println("title?"); //required
         String title = scanner.nextLine();
-        System.out.println("description?");
+        System.out.println("description?"); //required
         String description = scanner.nextLine();
-        System.out.println("body?");
+        System.out.println("body?"); //required
         String body = scanner.nextLine();
-        System.out.println("taglist? Enter tags separated by spaces");
-        List<String> stringList = Arrays.stream(scanner.nextLine().split("\s")).toList();
+        System.out.println("taglist? y/n"); //optional
+        String confirmation = scanner.nextLine();
+        List<String> tagList = new ArrayList<>();
+        if (confirmation.equals("y")) {
+            System.out.println("Enter tags separated by spaces\"");
+            tagList = Arrays.stream(scanner.nextLine().split("\s")).toList();
+        }
+
+        //building article creation request object
+        var request = ArticleCreationRequest.builder()
+                .title(title)
+                .description(description)
+                .body(body)
+                .tagList(tagList)
+                .build();
+
         // create new article with id
         Article savedArticle = articleRepository.save(Article.builder()
                 .author(user)
-                .title(title)
-                .slug(title.toLowerCase().replace(' ', '-'))
-                .description(description)
-                .body(body)
+                .title(request.getTitle())
+                .slug(request.getTitle().toLowerCase().replace(' ', '-'))
+                .description(request.getDescription())
+                .body(request.getBody())
                 .createdAt(LocalDateTime.now().toString())
                 .build());
         // check if there are existing tags with name from stringList in tagRepository
-        Set<Tag> existingTags = stringList
+        Set<Tag> existingTags = tagList
                 .stream()
                 .map(s -> tagRepository.findByName(s)
-                        .orElseGet(() -> new Tag(s))).collect(Collectors.toSet());
+                        .orElseGet(() -> new Tag(s)))
+                .collect(Collectors.toSet());
         // update tags with savedArticle
         existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
         existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());

@@ -1,4 +1,4 @@
-package com.hibernateRealworldRelations.realworldRelations.dto;
+package com.hibernateRealworldRelations.realworldRelations.dto.responses;
 
 import lombok.AllArgsConstructor;
 

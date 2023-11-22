@@ -1,6 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations.auxiliary;
 
-import com.hibernateRealworldRelations.realworldRelations.dto.ArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
