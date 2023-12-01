@@ -112,7 +112,8 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 				}
 				case "art":	{
 					System.out.println("---> Add test users with articles");
-					service.addTesUsersWithArticles();
+					service.addTestUsersWithArticles();
+					service.addTestArticlesByRequest();
 					break;
 				}
 				case "tgs":	{

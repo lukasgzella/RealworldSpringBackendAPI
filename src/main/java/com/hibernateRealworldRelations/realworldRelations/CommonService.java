@@ -1,5 +1,8 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.*;
 import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
@@ -9,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -129,7 +134,164 @@ public class CommonService {
 //        articleRepository.save(article);
     }
 
-    public void addTesUsersWithArticles() {
+    public void addTestArticlesByRequest() {
+        createArticleByRequest(
+                "1",
+                "u1t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2"));
+        createArticleByRequest(
+                "1",
+                "u1t2",
+                "desc1",
+                "body1",
+                List.of("t3","t4"));
+        createArticleByRequest(
+                "2",
+                "u2t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "2",
+                "u2t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "3",
+                "u3t1",
+                "desc1",
+                "body1",
+                List.of("t5","t6","t7","t8"));
+        createArticleByRequest(
+                "3",
+                "u3t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "4",
+                "u4t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "4",
+                "u4t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "5",
+                "u5t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "5",
+                "u5t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "6",
+                "u6t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "1",
+                "u6t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "7",
+                "u7t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "8",
+                "u8t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "8",
+                "u8t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "9",
+                "u9t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "9",
+                "u9t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "10",
+                "u10t1",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+        createArticleByRequest(
+                "1",
+                "u10t2",
+                "desc1",
+                "body1",
+                List.of("t1","t2","t3","t4"));
+    }
+
+    private void createArticleByRequest(
+            String userId, String title, String description, String body, List<String> tagList
+    ) {
+        Scanner scanner = new Scanner(System.in);
+
+        User user = userRepository.findById(Long.parseLong(userId));
+
+        //building article creation request object
+        var request = ArticleCreationRequest.builder()
+                .title(title)
+                .description(description)
+                .body(body)
+                .tagList(tagList)
+                .build();
+
+        // create new article with id
+        Article savedArticle = articleRepository.save(Article.builder()
+                .author(user)
+                .title(request.getTitle())
+                .slug(request.getTitle().toLowerCase().replace(' ', '-'))
+                .description(request.getDescription())
+                .body(request.getBody())
+                .createdAt(LocalDateTime.now().toString())
+                .build());
+        // check if there are existing tags with name from stringList in tagRepository
+        Set<Tag> existingTags = tagList
+                .stream()
+                .map(s -> tagRepository.findByName(s)
+                        .orElseGet(() -> new Tag(s)))
+                .collect(Collectors.toSet());
+        // update tags with savedArticle
+        existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
+        existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());
+
+        savedArticle.setTagList(existingTags);
+        articleRepository.save(savedArticle);
+        ArticleResponse res = new ArticleResponseMapper().apply(savedArticle);
+        System.out.println(res);
+    }
+
+    public void addTestUsersWithArticles() {
         addUser("john"); // user_id = 1
         addUser("mike"); // user_id = 2
         addUser("bob"); // user_id = 3
