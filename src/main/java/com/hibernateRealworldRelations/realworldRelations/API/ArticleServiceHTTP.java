@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Scanner;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +31,21 @@ public class ArticleServiceHTTP {
         return new MultipleArticleResponse(articles, articlesCount);
     }
 
+    @Transactional
+    public MultipleArticleResponse feedArticles(int limit, int offset) {
+
+        String user_id = scanner.nextLine();
+        Page<Article> articles = articleRepository.findArticlesFromFavoritesUsers(user_id, PageRequest.of(offset, limit));
+        articles.forEach(article -> System.out.println("Article{" +
+                "id=" + article.getId()
+        ));
+        List<ArticleResponse> articleResponses = articles.stream().
+                map(article -> new ArticleResponseMapper()
+                        .apply(article))
+                .toList();
+        long articlesCount = articleRepository.countArticlesFromFavoritesUsers(user_id);
+        var multi = new MultipleArticleResponse(articleResponses, articlesCount);
+        System.out.println(multi);
+    }
 
 }

@@ -1,19 +1,16 @@
 package com.hibernateRealworldRelations.realworldRelations.API;
 
-import com.hibernateRealworldRelations.realworldRelations.ArticleService;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RequestMapping("/api/articles")
 @RestController
 @RequiredArgsConstructor
 public class ArticleControllerHTTP {
 
-    private final ArticleServiceHTTP articleService;
+    private final ArticleServiceHTTP articleServiceHTTP;
 
     //    List Articles
     //    Authentication optional, will return multiple articles, ordered by most recent first
@@ -25,20 +22,20 @@ public class ArticleControllerHTTP {
             @RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset
     ) {
-        return ResponseEntity.ok(articleService.getArticles(tag, author, favorited, limit, offset));
+        return ResponseEntity.ok(articleServiceHTTP.getArticles(tag, author, favorited, limit, offset));
     }
 
-//    //   Feed Articles
-//    //   Authentication required, will return multiple articles created by followed users,
-//    //   ordered by most recent first.
-//    @GetMapping("/feed")
-//    public ResponseEntity<MultipleArticleResponse> feedArticles(
-//            @RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
-//            @RequestParam(value = "offset", required = false, defaultValue = "0") int offset
-//    ) {
-//        return ResponseEntity.ok(articleService.getArticlesFromFavoritesUsers(limit, offset));
-//    }
-//
+    //   Feed Articles
+    //   Authentication required, will return multiple articles created by followed users,
+    //   ordered by most recent first.
+    @GetMapping("/feed")
+    public ResponseEntity<MultipleArticleResponse> feedArticles(
+            @RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
+            @RequestParam(value = "offset", required = false, defaultValue = "0") int offset
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.feedArticles(limit, offset));
+    }
+
 //    //      Get Article
 //    //   permitAll, will return single article
 //    @GetMapping("/{slug}")
