@@ -1,9 +1,13 @@
-package com.hibernateRealworldRelations.realworldRelations.API;
+package com.hibernateRealworldRelations.realworldRelations.API.controllers;
 
+import com.hibernateRealworldRelations.realworldRelations.API.services.ArticleServiceHTTP;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequestMapping("/api/articles")
 @RestController
@@ -36,14 +40,14 @@ public class ArticleControllerHTTP {
         return ResponseEntity.ok(articleServiceHTTP.feedArticles(limit, offset));
     }
 
-//    //      Get Article
-//    //   permitAll, will return single article
-//    @GetMapping("/{slug}")
-//    public ResponseEntity<Map<String, ArticleResponse>> getArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(Map.of("article", articleService.getArticle(slug)));
-//    }
-//
-//
+    //      Get Article
+    //   permitAll, will return single article
+    @GetMapping("/{slug}")
+    public ResponseEntity<Map<String, ArticleResponse>> getArticle(@PathVariable("slug") String slug) {
+        return ResponseEntity.ok(Map.of("article", articleServiceHTTP.getArticle(slug)));
+    }
+
+
 //    //      Create Article
 //    //   Authentication required, will return multiple articles created by followed users,
 //    //   ordered by most recent first.

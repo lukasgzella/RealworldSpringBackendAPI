@@ -1,9 +1,11 @@
-package com.hibernateRealworldRelations.realworldRelations.API;
+package com.hibernateRealworldRelations.realworldRelations.API.services;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.IAuthenticationFacade;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import java.util.Scanner;
 @RequiredArgsConstructor
 public class ArticleServiceHTTP {
 
+    private IAuthenticationFacade authenticationFacade;
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
@@ -33,8 +36,8 @@ public class ArticleServiceHTTP {
 
     @Transactional
     public MultipleArticleResponse feedArticles(int limit, int offset) {
-
-        String user_id = scanner.nextLine();
+        User authenticatedUser = userRepository.findByUsername(authenticationFacade.getAuthentication().getName()).orElseThrow();
+        String user_id = authenticatedUser.getId().toString();
         Page<Article> articles = articleRepository.findArticlesFromFavoritesUsers(user_id, PageRequest.of(offset, limit));
         articles.forEach(article -> System.out.println("Article{" +
                 "id=" + article.getId()
@@ -44,8 +47,31 @@ public class ArticleServiceHTTP {
                         .apply(article))
                 .toList();
         long articlesCount = articleRepository.countArticlesFromFavoritesUsers(user_id);
-        var multi = new MultipleArticleResponse(articleResponses, articlesCount);
-        System.out.println(multi);
+        return new MultipleArticleResponse(articleResponses, articlesCount);
     }
 
+    public ArticleResponse getArticle(String slug) {
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        User authenticated = checkIfAuthenticated();
+        boolean favorited = false;
+        boolean following = false;
+        if (authenticated != null) {
+            favorited = isFavorited(article, authenticated);
+            following = isFollowing(authenticated, article.getAuthor());
+        }
+        article.setFavorited(favorited);
+        article.setFollowing(following);
+        return new ArticleResponseMapper().apply(article);
+    }
+    private User checkIfAuthenticated() {
+        String username = authenticationFacade.getAuthentication().getName();
+        return userRepository.findByUsername(username).orElse(null);
+    }
+    private boolean isFavorited(Article article, User authenticated) {
+        return authenticated.getFavoriteArticles().contains(article);
+    }
+
+    private boolean isFollowing(User userFrom, User userTo) {
+        return followerRepository.existsByFromTo(userFrom.getUsername(), userTo.getUsername());
+    }
 }
