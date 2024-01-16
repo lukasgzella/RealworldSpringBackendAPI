@@ -1,10 +1,12 @@
 package com.hibernateRealworldRelations.realworldRelations.API.services;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
-import com.hibernateRealworldRelations.realworldRelations.auxiliary.IAuthenticationFacade;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +15,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceHTTP {
 
-    private IAuthenticationFacade authenticationFacade;
+    private final AuthenticationFacade authenticationFacade;
     private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
@@ -63,6 +66,42 @@ public class ArticleServiceHTTP {
         article.setFollowing(following);
         return new ArticleResponseMapper().apply(article);
     }
+
+    public ArticleResponse createArticle(ArticleCreationRequest request) {
+        User user = checkIfAuthenticated();
+        List<String> tagList = request.getTagList();
+        // create new article with id
+        Article savedArticle = articleRepository.save(Article.builder()
+                .author(user)
+                .title(request.getTitle())
+                .slug(request.getTitle().toLowerCase().replace(' ', '-'))
+                .description(request.getDescription())
+                .body(request.getBody())
+                .createdAt(LocalDateTime.now().toString())
+                .build());
+        // check if there are existing tags with name from stringList in tagRepository
+        Set<Tag> existingTags = tagList
+                .stream()
+                .map(s -> tagRepository.findByName(s)
+                        .orElseGet(() -> new Tag(s)))
+                .collect(Collectors.toSet());
+        // update tags with savedArticle
+        existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
+        existingTags = existingTags.stream().map(tagRepository::save).collect(Collectors.toSet());
+
+        savedArticle.setTagList(existingTags);
+        articleRepository.save(savedArticle);
+        ArticleResponse res = new ArticleResponseMapper().apply(savedArticle);
+        System.out.println(res);
+        return res;
+    }
+
+
+
+
+
+
+
     private User checkIfAuthenticated() {
         String username = authenticationFacade.getAuthentication().getName();
         return userRepository.findByUsername(username).orElse(null);

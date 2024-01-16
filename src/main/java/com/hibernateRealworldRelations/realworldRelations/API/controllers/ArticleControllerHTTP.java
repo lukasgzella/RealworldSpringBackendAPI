@@ -1,6 +1,7 @@
 package com.hibernateRealworldRelations.realworldRelations.API.controllers;
 
 import com.hibernateRealworldRelations.realworldRelations.API.services.ArticleServiceHTTP;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import lombok.RequiredArgsConstructor;
@@ -48,16 +49,16 @@ public class ArticleControllerHTTP {
     }
 
 
-//    //      Create Article
-//    //   Authentication required, will return multiple articles created by followed users,
-//    //   ordered by most recent first.
-//    @PostMapping
-//    public ResponseEntity<ArticleResponse> createArticle(
-//            @RequestBody ArticleCreationRequest request
-//    ) {
-//        return ResponseEntity.ok(articleService.createArticle(request));
-//    }
-//
+    //      Create Article
+    //   Authentication required, will return multiple articles created by followed users,
+    //   ordered by most recent first.
+    @PostMapping
+    public ResponseEntity<ArticleResponse> createArticle(
+            @RequestBody ArticleCreationRequest request
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.createArticle(request));
+    }
+
 //    //      Update Article
 //    //   Authentication required, will return multiple articles created by followed users,
 //    //   ordered by most recent first.
