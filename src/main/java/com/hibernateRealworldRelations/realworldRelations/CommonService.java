@@ -326,4 +326,9 @@ public class CommonService {
         }
         System.out.println(follower);
     }
+
+    public void select() {
+        User user = userRepository.findByEmail("jake@jake.jake").orElseThrow();
+        System.out.println(user.getEmail());
+    }
 }

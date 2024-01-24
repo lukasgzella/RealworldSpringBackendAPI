@@ -37,6 +37,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("tgs - add test tags");
 			System.out.println("fav - add test favorites");
 			System.out.println("e - exit");
+			System.out.println("s - select email");
 
 			System.out.println("Choose from menu");
 			switch (scanner.nextLine()) {
@@ -136,6 +137,11 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 					service.makeArticleFavorite(8,2);
 					service.makeArticleFavorite(9,2);
 					service.makeArticleFavorite(10,2);
+					break;
+				}
+				case "s": {
+					System.out.println("---> select email from");
+					service.select();
 					break;
 				}
 				case "e": System.exit(0);

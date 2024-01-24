@@ -25,12 +25,9 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/console/**").permitAll()
-//                        .anyRequest().permitAll()
-//                        .requestMatchers("/**").hasRole("ADMIN")
-//                        .requestMatchers("/**").hasRole("USER")
                         .anyRequest().permitAll())
-//                .headers(h -> h.frameOptions(Customizer.withDefaults()) )
-                .headers(h -> h.frameOptions(Customizer.withDefaults()).disable() )
+                .headers(h -> h.frameOptions(Customizer.withDefaults()).disable())
+                .sessionManagement(Customizer.withDefaults())
 
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

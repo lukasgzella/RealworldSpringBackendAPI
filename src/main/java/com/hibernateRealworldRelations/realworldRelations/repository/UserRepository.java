@@ -9,7 +9,8 @@ import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User,Long> {
 
-//    Optional<User> findByEmail(String email);
+    Optional<User> findByEmail(String email);
+
     @Query("""
             SELECT u FROM User u 
             LEFT JOIN FETCH u.following 
@@ -24,4 +25,6 @@ public interface UserRepository extends CrudRepository<User,Long> {
 //    boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    boolean existsByEmail(String newEmail);
 }
