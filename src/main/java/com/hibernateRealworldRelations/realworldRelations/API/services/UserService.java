@@ -194,12 +194,13 @@ public class UserService {
                 .image(userTo.getImage())
                 .following(false)
                 .build();
-        String usernameFrom = authenticationFacade.getAuthentication().getName();
+        String emailFrom = authenticationFacade.getAuthentication().getName();
+        User userFrom = userRepository.findByEmail(emailFrom).orElseThrow();
+        String usernameFrom = userFrom.getUsernameDB();
         boolean isFollowing = followerRepository.existsByFromTo(usernameFrom, username);
         if (!isFollowing) {
             return res;
         }
-        User userFrom = userRepository.findByUsername(usernameFrom).orElseThrow();
         Follower follower = followerRepository.findByFromTo(usernameFrom, username).get();
         userFrom.getFollowing().remove(follower);
         userTo.getFollowers().remove(follower);
