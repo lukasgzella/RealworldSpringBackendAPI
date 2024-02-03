@@ -133,9 +133,7 @@ public class UserService {
 
     private User retrieveCurrentUserFromDb() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentPrincialName = authentication.getName();
         String principal = authenticationFacade.getAuthentication().getName();
-        System.out.println(principal);
         return userRepository.findByEmail(principal).orElseThrow();
     }
 
