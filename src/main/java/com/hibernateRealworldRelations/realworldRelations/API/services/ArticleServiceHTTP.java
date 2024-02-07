@@ -1,6 +1,7 @@
 package com.hibernateRealworldRelations.realworldRelations.API.services;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapperWithAuthenticatedUser;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
@@ -28,13 +29,25 @@ public class ArticleServiceHTTP {
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
-    private final FollowerRepository followerRepository;
+    private final ArticleResponseMapperWithAuthenticatedUser articleResponseMapperWithAuthenticatedUser;
 
     public MultipleArticleResponse getArticles(String tag, String author, String favorited, int limit, int offset) {
-        Page<Article> page = articleRepository.findArticlesByParamsPage(author, tag, favorited, PageRequest.of(offset, limit));
+
+        List<ArticleResponse> articleResponses = new ArrayList<>();
         long articlesCount = articleRepository.countArticlesByParams(author, tag, favorited);
-        List<ArticleResponse> articles = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
-        return new MultipleArticleResponse(articles, articlesCount);
+
+        Page<Article> page = articleRepository
+                .findArticlesByParamsPageOrderedByMostRecentFirst(author, tag, favorited, PageRequest.of(offset, limit));
+
+        User authenticated = checkIfAuthenticated();
+        if (authenticated != null) {
+            articleResponses = page.map(
+                    article -> articleResponseMapperWithAuthenticatedUser.apply(authenticated, article))
+                    .toList();
+        } else {
+            articleResponses = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
+        }
+        return new MultipleArticleResponse(articleResponses, articlesCount);
     }
 
     @Transactional
@@ -56,14 +69,9 @@ public class ArticleServiceHTTP {
     public ArticleResponse getArticle(String slug) {
         Article article = articleRepository.findBySlug(slug).orElseThrow();
         User authenticated = checkIfAuthenticated();
-        boolean favorited = false;
-        boolean following = false;
         if (authenticated != null) {
-            favorited = isFavorited(article, authenticated);
-            following = isFollowing(authenticated, article.getAuthor());
+            return articleResponseMapperWithAuthenticatedUser.apply(authenticated, article);
         }
-        article.setFavorited(favorited);
-        article.setFollowing(following);
         return new ArticleResponseMapper().apply(article);
     }
 
@@ -103,14 +111,7 @@ public class ArticleServiceHTTP {
 
 
     private User checkIfAuthenticated() {
-        String username = authenticationFacade.getAuthentication().getName();
-        return userRepository.findByUsername(username).orElse(null);
-    }
-    private boolean isFavorited(Article article, User authenticated) {
-        return authenticated.getFavoriteArticles().contains(article);
-    }
-
-    private boolean isFollowing(User userFrom, User userTo) {
-        return followerRepository.existsByFromTo(userFrom.getUsername(), userTo.getUsername());
+        String userEmail = authenticationFacade.getAuthentication().getName();
+        return userRepository.findByEmail(userEmail).orElse(null);
     }
 }
