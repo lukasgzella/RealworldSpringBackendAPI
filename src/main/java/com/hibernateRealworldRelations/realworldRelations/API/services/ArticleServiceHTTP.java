@@ -52,15 +52,12 @@ public class ArticleServiceHTTP {
 
     @Transactional
     public MultipleArticleResponse feedArticles(int limit, int offset) {
-        User authenticatedUser = userRepository.findByUsername(authenticationFacade.getAuthentication().getName()).orElseThrow();
+        User authenticatedUser = checkIfAuthenticated();
         String user_id = authenticatedUser.getId().toString();
         Page<Article> articles = articleRepository.findArticlesFromFavoritesUsers(user_id, PageRequest.of(offset, limit));
-        articles.forEach(article -> System.out.println("Article{" +
-                "id=" + article.getId()
-        ));
+
         List<ArticleResponse> articleResponses = articles.stream().
-                map(article -> new ArticleResponseMapper()
-                        .apply(article))
+                map(article -> articleResponseMapperWithAuthenticatedUser.apply(authenticatedUser, article))
                 .toList();
         long articlesCount = articleRepository.countArticlesFromFavoritesUsers(user_id);
         return new MultipleArticleResponse(articleResponses, articlesCount);
