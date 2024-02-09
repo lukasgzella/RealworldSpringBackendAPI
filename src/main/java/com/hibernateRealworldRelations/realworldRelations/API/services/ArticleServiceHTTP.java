@@ -66,7 +66,12 @@ public class ArticleServiceHTTP {
     public ArticleResponse getArticle(String slug) {
         Article article = articleRepository.findBySlug(slug).orElseThrow();
         User authenticated = checkIfAuthenticated();
-        if (authenticated != null) {
+        if (authenticated == null) {
+            return new ArticleResponseMapper().apply(article);
+        }
+        String emailFrom = authenticated.getEmail();
+        System.out.println(emailFrom);
+        if (!emailFrom.equals("anonymousUser")) {
             return articleResponseMapperWithAuthenticatedUser.apply(authenticated, article);
         }
         return new ArticleResponseMapper().apply(article);
