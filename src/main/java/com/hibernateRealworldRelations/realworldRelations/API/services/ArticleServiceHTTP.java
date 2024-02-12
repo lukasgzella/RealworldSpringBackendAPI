@@ -78,22 +78,25 @@ public class ArticleServiceHTTP {
     }
 
     public ArticleResponse createArticle(ArticleCreationRequest request) {
-        User user = checkIfAuthenticated();
+        User authenticated = checkIfAuthenticated();
         List<String> tagList = request.getTagList();
         // create new article with id
         Article savedArticle = articleRepository.save(Article.builder()
-                .author(user)
+                .author(authenticated)
                 .title(request.getTitle())
                 .slug(request.getTitle().toLowerCase().replace(' ', '-'))
                 .description(request.getDescription())
                 .body(request.getBody())
                 .createdAt(LocalDateTime.now().toString())
                 .build());
+        if (tagList == null) {
+            return new ArticleResponseMapper().apply(savedArticle);
+        }
         // check if there are existing tags with name from stringList in tagRepository
         Set<Tag> existingTags = tagList
                 .stream()
-                .map(s -> tagRepository.findByName(s)
-                        .orElseGet(() -> new Tag(s)))
+                .map(string -> tagRepository.findByName(string)
+                        .orElseGet(() -> new Tag(string)))
                 .collect(Collectors.toSet());
         // update tags with savedArticle
         existingTags.forEach(tag -> tag.getArticles().add(savedArticle));
@@ -101,9 +104,7 @@ public class ArticleServiceHTTP {
 
         savedArticle.setTagList(existingTags);
         articleRepository.save(savedArticle);
-        ArticleResponse res = new ArticleResponseMapper().apply(savedArticle);
-        System.out.println(res);
-        return res;
+        return new ArticleResponseMapper().apply(savedArticle);
     }
 
 

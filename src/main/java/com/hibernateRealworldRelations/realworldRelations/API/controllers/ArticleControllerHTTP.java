@@ -20,14 +20,15 @@ public class ArticleControllerHTTP {
     //    List Articles
     //    Authentication optional, will return multiple articles, ordered by most recent first
     @GetMapping
-    public ResponseEntity<MultipleArticleResponse> listArticles(
+    public ResponseEntity<Map<String, Object>> listArticles(
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "favorited", required = false) String favorited,
             @RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset
     ) {
-        return ResponseEntity.ok(articleServiceHTTP.getArticles(tag, author, favorited, limit, offset));
+        MultipleArticleResponse res = articleServiceHTTP.getArticles(tag, author, favorited, limit, offset);
+        return ResponseEntity.ok(Map.of("articles", res.getArticles(), "articlesCount", res.getArticlesCount()));
     }
 
     //   Feed Articles
@@ -50,8 +51,7 @@ public class ArticleControllerHTTP {
 
 
     //      Create Article
-    //   Authentication required, will return multiple articles created by followed users,
-    //   ordered by most recent first.
+    //   Authentication required, will return an Article
     @PostMapping
     public ResponseEntity<ArticleResponse> createArticle(
             @RequestBody ArticleCreationRequest request
