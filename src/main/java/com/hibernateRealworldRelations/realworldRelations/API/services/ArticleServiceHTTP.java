@@ -4,6 +4,7 @@ import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleRespo
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapperWithAuthenticatedUser;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleUpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
@@ -105,6 +106,23 @@ public class ArticleServiceHTTP {
         savedArticle.setTagList(existingTags);
         articleRepository.save(savedArticle);
         return new ArticleResponseMapper().apply(savedArticle);
+    }
+
+    public ArticleResponse updateArticle(String slug, ArticleUpdateRequest request) {
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        if (request.getTitle() != null) {
+            article.setTitle(request.getTitle());
+            article.setSlug(request.getTitle().toLowerCase().replace(' ', '-'));
+        }
+        if (request.getDescription() != null) {
+            article.setDescription(request.getDescription());
+        }
+        if (request.getBody() != null) {
+            article.setBody(request.getBody());
+        }
+
+        article = articleRepository.save(article);
+        return new ArticleResponseMapper().apply(article);
     }
 
 
