@@ -125,6 +125,12 @@ public class ArticleServiceHTTP {
         return new ArticleResponseMapper().apply(article);
     }
 
+    public void deleteArticle(String slug) {
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        articleRepository.delete(article);
+        System.out.println("Article deleted");
+    }
+
 
 
 
