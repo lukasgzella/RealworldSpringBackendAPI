@@ -297,7 +297,6 @@ public class ArticleService {
     }
 
     public void updateArticle() {
-//        Authentication required, returns the updated Article
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter slug? PUT /api/articles/:slug");
         String slug = scanner.nextLine();

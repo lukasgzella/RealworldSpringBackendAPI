@@ -48,6 +48,10 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.DELETE, "/api/articles/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/articles/*/comments").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/articles/*/comments").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/api/articles/*/comments/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/articles/*/favorite").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/articles/*/favorite").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/tags").permitAll()
 //                        .anyRequest().permitAll()
                 )
 

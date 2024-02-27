@@ -5,10 +5,7 @@ import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleUpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.CommentCreationRequest;
-import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
-import com.hibernateRealworldRelations.realworldRelations.dto.responses.CommentResponse;
-import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
-import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleCommentResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.*;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
@@ -23,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +45,7 @@ public class ArticleServiceHTTP {
         User authenticated = checkIfAuthenticated();
         if (authenticated != null) {
             articleResponses = page.map(
-                    article -> articleResponseMapperWithAuthenticatedUser.apply(authenticated, article))
+                            article -> articleResponseMapperWithAuthenticatedUser.apply(authenticated, article))
                     .toList();
         } else {
             articleResponses = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
@@ -183,6 +181,75 @@ public class ArticleServiceHTTP {
 
         return new MultipleCommentResponse(commentResponses);
     }
+
+    @Transactional
+    public void deleteComment(String slug, String id) {
+        long commentId = Integer.parseInt(id);
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        User author = userRepository.findById(comment.getAuthor().getId()).orElseThrow();
+
+        User authenticated = checkIfAuthenticated();
+        if (authenticated != null && authenticated.equals(comment.getAuthor())) {
+            List<Comment> comments = article.getComments();
+            List<Comment> userComments = author.getComments();
+            comments.remove(comment);
+            userComments.remove(comment);
+            article.setComments(comments);
+            author.setComments(userComments);
+
+            articleRepository.save(article);
+            userRepository.save(author);
+            commentRepository.delete(comment);
+            System.out.println("comment deleted");
+        }
+    }
+
+    @Transactional
+    public ArticleResponse favoriteArticle(String slug) {
+        User authenticated = checkIfAuthenticated();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+
+        Set<Article> favoritesArticles = authenticated.getFavoriteArticles();
+        Set<User> followingUsers = article.getFollowingUsers();
+        favoritesArticles.add(article);
+        followingUsers.add(authenticated);
+        article.setFollowingUsers(followingUsers);
+        authenticated.setFavoriteArticles(favoritesArticles);
+
+        article = articleRepository.save(article);
+        userRepository.save(authenticated);
+
+        return articleResponseMapperWithAuthenticatedUser.apply(authenticated, article);
+    }
+
+    @Transactional
+    public ArticleResponse unfavoriteArticle(String slug) {
+        // auth required and no additional parameters required
+        User authenticated = checkIfAuthenticated();
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+
+        Set<Article> favoritesArticles = authenticated.getFavoriteArticles();
+        Set<User> followingUsers = article.getFollowingUsers();
+        favoritesArticles.remove(article);
+        followingUsers.remove(authenticated);
+        article.setFollowingUsers(followingUsers);
+        authenticated.setFavoriteArticles(favoritesArticles);
+
+        article = articleRepository.save(article);
+        userRepository.save(authenticated);
+
+        return articleResponseMapperWithAuthenticatedUser.apply(authenticated, article);
+    }
+
+    public void getTags() {
+        Iterable<Tag> tags = tagRepository.findAll();
+        List<String> tagList = StreamSupport.stream(tags.spliterator(), false)
+                .map(Tag::getName).toList();
+        MultipleTagResponse multi = new MultipleTagResponse(tagList);
+        System.out.println(multi);
+    }
+
 
     private User checkIfAuthenticated() {
         String userEmail = authenticationFacade.getAuthentication().getName();
