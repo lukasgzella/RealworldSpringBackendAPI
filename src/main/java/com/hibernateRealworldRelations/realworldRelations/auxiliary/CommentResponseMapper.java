@@ -16,7 +16,7 @@ public class CommentResponseMapper implements Function<Comment, CommentResponse>
                 .updatedAt(comment.getUpdatedAt())
                 .body(comment.getBody())
                 .author(new Author(
-                        comment.getAuthor().getUsername(),
+                        comment.getAuthor().getUsernameDB(),
                         comment.getAuthor().getBio(),
                         comment.getAuthor().getImage(),
                         false

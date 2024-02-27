@@ -38,6 +38,7 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 			System.out.println("fav - add test favorites");
 			System.out.println("e - exit");
 			System.out.println("s - select email");
+			System.out.println("auth - getAuthentication - facade");
 
 			System.out.println("Choose from menu");
 			switch (scanner.nextLine()) {
@@ -142,6 +143,11 @@ public class RealworldRelationsApplication implements CommandLineRunner {
 				case "s": {
 					System.out.println("---> select email from");
 					service.select();
+					break;
+				}
+				case "auth": {
+					System.out.println("---> getting auth");
+					service.getAuth();
 					break;
 				}
 				case "e": System.exit(0);

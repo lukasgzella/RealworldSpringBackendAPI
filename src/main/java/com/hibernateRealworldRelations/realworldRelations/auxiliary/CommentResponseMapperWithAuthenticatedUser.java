@@ -24,10 +24,10 @@ public class CommentResponseMapperWithAuthenticatedUser implements BiFunction<Us
                 .updatedAt(comment.getUpdatedAt())
                 .body(comment.getBody())
                 .author(new Author(
-                        comment.getAuthor().getUsername(),
+                        comment.getAuthor().getUsernameDB(),
                         comment.getAuthor().getBio(),
                         comment.getAuthor().getImage(),
-                        isFollowing(user, comment.getAuthor())
+                        isFollowing(user, comment.getArticle().getAuthor())
                 ))
                 .build();
     }

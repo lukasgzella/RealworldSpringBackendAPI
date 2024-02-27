@@ -1,5 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations.dto.responses;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonRootName("comment")
 public class CommentResponse {
 
     private long id;

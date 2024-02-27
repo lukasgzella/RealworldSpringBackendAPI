@@ -1,13 +1,16 @@
 package com.hibernateRealworldRelations.realworldRelations.API.services;
 
-import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
-import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapperWithAuthenticatedUser;
-import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.*;
+import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleUpdateRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.CommentCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.CommentResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleCommentResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Article;
+import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.*;
@@ -31,6 +34,7 @@ public class ArticleServiceHTTP {
     private final TagRepository tagRepository;
     private final CommentRepository commentRepository;
     private final ArticleResponseMapperWithAuthenticatedUser articleResponseMapperWithAuthenticatedUser;
+    private final CommentResponseMapperWithAuthenticatedUser commentResponseMapperWithAuthenticatedUser;
 
     public MultipleArticleResponse getArticles(String tag, String author, String favorited, int limit, int offset) {
 
@@ -121,6 +125,7 @@ public class ArticleServiceHTTP {
             article.setBody(request.getBody());
         }
 
+        article.setUpdatedAt(LocalDateTime.now().toString());
         article = articleRepository.save(article);
         return new ArticleResponseMapper().apply(article);
     }
@@ -131,11 +136,53 @@ public class ArticleServiceHTTP {
         System.out.println("Article deleted");
     }
 
+    @Transactional
+    public CommentResponse addCommentsToAnArticle(String slug, CommentCreationRequest request) {
+        // todo fix isFollowing in CommentResponseMapper
+        Article article = articleRepository.findBySlug(slug).orElseThrow();
+
+        User author = checkIfAuthenticated();
+        Comment comment = Comment.builder()
+                .author(author)
+                .article(article)
+                .createdAt(LocalDateTime.now().toString())
+                .body(request.getBody())
+                .build();
+        comment = commentRepository.save(comment);
+        List<Comment> comments = article.getComments();
+        List<Comment> userComments = author.getComments();
+        comments.add(comment);
+        userComments.add(comment);
+        article.setComments(comments);
+        author.setComments(userComments);
+
+        articleRepository.save(article);
+        userRepository.save(author);
+
+        return commentResponseMapperWithAuthenticatedUser.apply(author, comment);
+    }
+
+    public MultipleCommentResponse getCommentsFromAnArticle(String slug) {
+        Article article = articleRepository.findBySlugWithComments(slug).orElseThrow();
+        List<Comment> comments = article.getComments();
 
 
+        List<CommentResponse> commentResponses = new ArrayList<>();
 
+        User authenticated = checkIfAuthenticated();
+        if (authenticated == null) {
+            commentResponses = comments.stream()
+                    .map(c -> new CommentResponseMapper().apply(c))
+                    .toList();
+        } else {
+            for (Comment comment : comments) {
+                CommentResponse commentResponse = commentResponseMapperWithAuthenticatedUser.apply(authenticated, comment);
+                commentResponses.add(commentResponse);
+            }
+        }
 
-
+        return new MultipleCommentResponse(commentResponses);
+    }
 
     private User checkIfAuthenticated() {
         String userEmail = authenticationFacade.getAuthentication().getName();
