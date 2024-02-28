@@ -2,12 +2,18 @@ package com.hibernateRealworldRelations.realworldRelations.API.controllers;
 
 import com.hibernateRealworldRelations.realworldRelations.API.services.ArticleServiceHTTP;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleUpdateRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.CommentCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.CommentResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleArticleResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleCommentResponse;
+import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/api/articles")
@@ -59,56 +65,67 @@ public class ArticleControllerHTTP {
         return ResponseEntity.ok(articleServiceHTTP.createArticle(request));
     }
 
-//    //      Update Article
-//    //   Authentication required, will return multiple articles created by followed users,
-//    //   ordered by most recent first.
-//    @PutMapping("/{slug}")
-//    public ResponseEntity<List<Article>> updateArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //      Delete Article
-//    //  Auth required
-//    @DeleteMapping("/{slug}")
-//    public ResponseEntity<List<Article>> deleteArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //  Add Comments to an Article
-//    //  Auth required
-//    @PostMapping("/{slug}/comments")
-//    public ResponseEntity<List<Article>> deleteArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //    Get Comments from an Article
-//    //  Auth required
-//    @GetMapping("/{slug}/comments")
-//    public ResponseEntity<List<Article>> deleteArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //    Delete Comment
-//    //  Auth required
-//    @DeleteMapping("/{slug}/comments/{id}")
-//    public ResponseEntity<List<Article>> deleteArticle(
-//            @PathVariable("slug") String slug,
-//            @PathVariable("id") String id
-//    ) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //    Favorite Article
-//    //  Auth required
-//    @PostMapping("/{slug}/favorite")
-//    public ResponseEntity<List<Article>> deleteArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
-//
-//    //    Unfavorite Article
-//    //  Auth required
-//    @DeleteMapping("/{slug}/favorite")
-//    public ResponseEntity<List<Article>> deleteArticle(@PathVariable("slug") String slug) {
-//        return ResponseEntity.ok(profileService.getProfile(username));
-//    }
+    //      Update Article
+    //   Authentication required, will return the updated Article
+    @PutMapping("/{slug}")
+    public ResponseEntity<ArticleResponse> updateArticle(
+            @PathVariable("slug") String slug,
+            @RequestBody ArticleUpdateRequest request
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.updateArticle(slug, request));
+    }
+
+    //      Delete Article
+    //  Auth required
+    @DeleteMapping("/{slug}")
+    public void deleteArticle(@PathVariable("slug") String slug) {
+        articleServiceHTTP.deleteArticle(slug);
+    }
+
+    //  Add Comments to an Article
+    //  Auth required
+    @PostMapping("/{slug}/comments")
+    public ResponseEntity<CommentResponse> addCommentsToAnArticle(
+            @PathVariable("slug") String slug,
+            @RequestBody CommentCreationRequest request
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.addCommentsToAnArticle(slug, request));
+    }
+
+    //    Get Comments from an Article
+    //  Auth optional
+    @GetMapping("/{slug}/comments")
+    public ResponseEntity<MultipleCommentResponse> getCommentsFromAnArticle(
+            @PathVariable("slug") String slug
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.getCommentsFromAnArticle(slug));
+    }
+
+    //    Delete Comment
+    //  Auth required
+    @DeleteMapping("/{slug}/comments/{id}")
+    public void deleteComment(
+            @PathVariable("slug") String slug,
+            @PathVariable("id") String id
+    ) {
+        articleServiceHTTP.deleteComment(slug, id);
+    }
+
+    //    Favorite Article
+    //  Auth required
+    @PostMapping("/{slug}/favorite")
+    public ResponseEntity<ArticleResponse> favoriteArticle(
+            @PathVariable("slug") String slug
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.favoriteArticle(slug));
+    }
+
+    //    Unfavorite Article
+    //  Auth required
+    @DeleteMapping("/{slug}/favorite")
+    public ResponseEntity<List<Article>> unfavoriteArticle(
+            @PathVariable("slug") String slug
+    ) {
+        return ResponseEntity.ok(articleServiceHTTP.unfavoriteArticle(slug));
+    }
 }
