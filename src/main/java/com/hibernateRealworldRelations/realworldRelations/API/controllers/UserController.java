@@ -1,10 +1,12 @@
 package com.hibernateRealworldRelations.realworldRelations.API.controllers;
 
+import com.hibernateRealworldRelations.realworldRelations.API.services.ArticleServiceHTTP;
 import com.hibernateRealworldRelations.realworldRelations.API.services.UserService;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.LoginRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.RegistrationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.UpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.LoginResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.MultipleTagResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService service;
+    private final ArticleServiceHTTP articleServiceHTTP;
 
     // Authentication
     @PostMapping("/api/users/login")
@@ -59,8 +62,14 @@ public class UserController {
     }
 
     // Unfollow User
-    @DeleteMapping("/api/profiles/{username}/follow")
+    @DeleteMapping("/api/profiles/{username}/unfollow")
     public ResponseEntity<ProfileResponse> unfollowUser(@PathVariable("username") String username) {
         return ResponseEntity.ok(service.unfollowUser(username));
+    }
+
+    // Get Tags
+    @GetMapping("/api/tags")
+    public ResponseEntity<MultipleTagResponse> getTags() {
+        return ResponseEntity.ok(articleServiceHTTP.getTags());
     }
 }

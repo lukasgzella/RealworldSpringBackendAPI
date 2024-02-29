@@ -242,12 +242,11 @@ public class ArticleServiceHTTP {
         return articleResponseMapperWithAuthenticatedUser.apply(authenticated, article);
     }
 
-    public void getTags() {
+    public MultipleTagResponse getTags() {
         Iterable<Tag> tags = tagRepository.findAll();
         List<String> tagList = StreamSupport.stream(tags.spliterator(), false)
                 .map(Tag::getName).toList();
-        MultipleTagResponse multi = new MultipleTagResponse(tagList);
-        System.out.println(multi);
+        return new MultipleTagResponse(tagList);
     }
 
 
