@@ -28,7 +28,7 @@ public class Article {
     @ManyToMany(mappedBy = "favoriteArticles")
     private Set<User> followingUsers = new HashSet<>();
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
     @Builder.Default
