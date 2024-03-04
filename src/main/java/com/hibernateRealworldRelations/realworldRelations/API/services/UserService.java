@@ -45,7 +45,7 @@ public class UserService {
         return LoginResponse.builder()
                 .email(user.getEmail())
                 .token(jwtToken)
-                .username(user.getUsername())
+                .username(user.getUsernameDB())
                 .bio(user.getBio())
                 .image(user.getImage())
                 .build();
@@ -64,7 +64,7 @@ public class UserService {
         return LoginResponse.builder()
                 .email(user.getEmail())
                 .token(jwtToken)
-                .username(user.getUsername())
+                .username(user.getUsernameDB())
                 .bio(user.getBio())
                 .image(user.getImage())
                 .build();
@@ -140,7 +140,6 @@ public class UserService {
     @Transactional
     public ProfileResponse getProfile(String username) {
         // todo exception no such user
-        //todo auth.getname return email not username -> to fix
         User userTo = userRepository.findByUsername(username).orElseThrow();
         String emailFrom = authenticationFacade.getAuthentication().getName();
         boolean isFollowing = false;

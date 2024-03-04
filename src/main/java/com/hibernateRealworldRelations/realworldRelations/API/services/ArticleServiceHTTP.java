@@ -1,7 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations.API.services;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.*;
-import com.hibernateRealworldRelations.realworldRelations.dto.Author;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleUpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.CommentCreationRequest;
@@ -10,7 +9,11 @@ import com.hibernateRealworldRelations.realworldRelations.entity.Article;
 import com.hibernateRealworldRelations.realworldRelations.entity.Comment;
 import com.hibernateRealworldRelations.realworldRelations.entity.Tag;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
-import com.hibernateRealworldRelations.realworldRelations.repository.*;
+import com.hibernateRealworldRelations.realworldRelations.repository.ArticleRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.CommentRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.TagRepository;
+import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -90,7 +96,7 @@ public class ArticleServiceHTTP {
                 .slug(request.getTitle().toLowerCase().replace(' ', '-'))
                 .description(request.getDescription())
                 .body(request.getBody())
-                .createdAt(LocalDateTime.now().toString())
+                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")))
                 .build());
         if (tagList == null) {
             return new ArticleResponseMapper().apply(savedArticle);
@@ -123,7 +129,7 @@ public class ArticleServiceHTTP {
             article.setBody(request.getBody());
         }
 
-        article.setUpdatedAt(LocalDateTime.now().toString());
+        article.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")));
         article = articleRepository.save(article);
         return new ArticleResponseMapper().apply(article);
     }
