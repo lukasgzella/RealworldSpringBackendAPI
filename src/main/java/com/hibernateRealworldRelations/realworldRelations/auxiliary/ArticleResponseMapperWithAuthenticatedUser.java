@@ -32,7 +32,7 @@ public class ArticleResponseMapperWithAuthenticatedUser implements BiFunction<Us
 
                 .favoritesCount(article.getFollowingUsers().size()) // followingUsers Hashset.size()
                 .author(new Author(
-                        article.getAuthor().getUsername(),
+                        article.getAuthor().getUsernameDB(),
                         article.getAuthor().getBio(),
                         article.getAuthor().getImage(),
 

@@ -21,7 +21,7 @@ public class ArticleResponseMapper implements Function<Article, ArticleResponse>
                 .favorited(article.isFavorited())
                 .favoritesCount(article.getFollowingUsers().size()) // followingUsers Hashset.size()
                 .author(new Author(
-                        article.getAuthor().getUsername(),
+                        article.getAuthor().getUsernameDB(),
                         article.getAuthor().getBio(),
                         article.getAuthor().getImage(),
                         article.isFollowing()

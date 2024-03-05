@@ -1,9 +1,13 @@
 package com.hibernateRealworldRelations.realworldRelations.dto.responses;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
+@Getter
+@Setter
 @AllArgsConstructor
 public class MultipleTagResponse {
 

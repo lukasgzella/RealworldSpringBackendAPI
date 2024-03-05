@@ -170,7 +170,6 @@ public class ArticleServiceHTTP {
         Article article = articleRepository.findBySlugWithComments(slug).orElseThrow();
         List<Comment> comments = article.getComments();
 
-
         List<CommentResponse> commentResponses = new ArrayList<>();
 
         User authenticated = checkIfAuthenticated();

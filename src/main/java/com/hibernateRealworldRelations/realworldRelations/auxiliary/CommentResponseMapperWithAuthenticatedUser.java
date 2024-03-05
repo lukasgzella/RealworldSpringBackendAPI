@@ -27,7 +27,7 @@ public class CommentResponseMapperWithAuthenticatedUser implements BiFunction<Us
                         comment.getAuthor().getUsernameDB(),
                         comment.getAuthor().getBio(),
                         comment.getAuthor().getImage(),
-                        isFollowing(user, comment.getArticle().getAuthor())
+                        isFollowing(user, comment.getAuthor())
                 ))
                 .build();
     }
