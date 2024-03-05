@@ -39,7 +39,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT,"/api/user").authenticated()
                         .requestMatchers(HttpMethod.GET,"/api/profiles/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/profiles/*/follow").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,"/api/profiles/*/unfollow").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/profiles/*/follow").authenticated()
                         .requestMatchers(HttpMethod.GET,"/api/articles").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/articles/*").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/articles").authenticated()

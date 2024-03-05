@@ -116,5 +116,4 @@ public interface ArticleRepository extends CrudRepository<Article, Long> {
             @Param("favorited") String favorited,
             Pageable pageable
     );
-
 }

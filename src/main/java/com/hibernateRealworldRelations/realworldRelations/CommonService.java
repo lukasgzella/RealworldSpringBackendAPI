@@ -1,6 +1,8 @@
 package com.hibernateRealworldRelations.realworldRelations;
 
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.ArticleResponseMapper;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
+import com.hibernateRealworldRelations.realworldRelations.auxiliary.IAuthenticationFacade;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.ArticleCreationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ArticleResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.*;
@@ -25,6 +27,7 @@ public class CommonService {
     private final ArticleRepository articleRepository;
     private final CommentRepository commentRepository;
     private final TagRepository tagRepository;
+    private final AuthenticationFacade authenticationFacade;
 
     public void addUser(String username) {
         User user = User.builder().username(username).build();
@@ -330,5 +333,15 @@ public class CommonService {
     public void select() {
         User user = userRepository.findByEmail("jake@jake.jake").orElseThrow();
         System.out.println(user.getEmail());
+    }
+
+    public void getAuth() {
+        try {
+            String name = authenticationFacade.getAuthentication().getName();
+            System.out.println(name);
+        } catch (NullPointerException e) {
+            System.out.println("auth is currently null");
+        }
+
     }
 }

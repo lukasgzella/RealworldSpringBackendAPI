@@ -1,5 +1,6 @@
 package com.hibernateRealworldRelations.realworldRelations.dto.requests;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonRootName("article")
 public class ArticleCreationRequest {
 
     private String title;
