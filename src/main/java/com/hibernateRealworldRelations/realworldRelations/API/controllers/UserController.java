@@ -76,7 +76,7 @@ public class UserController {
     }
 
     // Get Tags
-    @GetMapping("/api/tags")
+    @GetMapping("/tags")
     public ResponseEntity<MultipleTagResponse> getTags() {
         return ResponseEntity.ok(articleServiceHTTP.getTags());
     }
