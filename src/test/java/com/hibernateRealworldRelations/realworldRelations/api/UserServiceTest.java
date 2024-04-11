@@ -9,12 +9,14 @@ import com.hibernateRealworldRelations.realworldRelations.entity.Role;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
@@ -84,5 +86,20 @@ public class UserServiceTest {
         //then
         assertEquals(expected, actual);
         verify(userRepository).save(user);
+    }
+
+    @Test
+    public void registerUser_usernameAlreadyExists_throwsIllegalArgumentException() {
+        //given
+        RegistrationRequest request = RegistrationRequest.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .build();
+        when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
+        //when/then
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.registerUser(request),
+                "Provided email or username already exists");
     }
 }

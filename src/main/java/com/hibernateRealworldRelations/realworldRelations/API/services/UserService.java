@@ -50,9 +50,10 @@ public class UserService {
                 .image(user.getImage())
                 .build();
     }
-// todo check if username and email is unique
     public LoginResponse registerUser(RegistrationRequest request) {
-        System.out.println(request.toString());
+        if (isEmailExists(request.getEmail()) || isUsernameExists(request.getUsername())) {
+            throw new IllegalArgumentException("Provided email or username already exists");
+        }
         var user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -85,10 +86,10 @@ public class UserService {
     public LoginResponse updateUser(UpdateRequest request) {
         var user = retrieveCurrentUserFromDb();
 
-        if (isEmailUnique(request.getEmail())) {
+        if (isEmailExists(request.getEmail())) {
             throw new IllegalArgumentException("Provided email already exists");
         }
-        if (isUsernameUnique(request.getUsername())) {
+        if (isUsernameExists(request.getUsername())) {
             throw new IllegalArgumentException("Provided username already exists");
         }
 
@@ -123,11 +124,11 @@ public class UserService {
         return user;
     }
 
-    private boolean isEmailUnique(String email) {
+    private boolean isEmailExists(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    private boolean isUsernameUnique(String username) {
+    private boolean isUsernameExists(String username) {
         return userRepository.existsByUsername(username);
     }
 
