@@ -102,4 +102,19 @@ public class UserServiceTest {
                 () -> userService.registerUser(request),
                 "Provided email or username already exists");
     }
+
+    @Test
+    public void registerUser_emailAlreadyExists_throwsIllegalArgumentException() {
+        //given
+        RegistrationRequest request = RegistrationRequest.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .build();
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        //when/then
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.registerUser(request),
+                "Provided email or username already exists");
+    }
 }
