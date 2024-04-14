@@ -13,7 +13,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +31,7 @@ public class UserServiceTest {
     private AuthenticationManager authenticationManager;
     private AuthenticationFacade authenticationFacade;
     private UserService userService;
+    private Authentication auth;
 
     @BeforeEach
     public void mockFields() {
@@ -37,6 +41,7 @@ public class UserServiceTest {
         jwtService = mock(JwtService.class);
         authenticationManager = mock(AuthenticationManager.class);
         authenticationFacade = mock(AuthenticationFacade.class);
+        auth = mock(Authentication.class);
         userService = new UserService(
                 userRepository,
                 followerRepository,
@@ -116,5 +121,31 @@ public class UserServiceTest {
         assertThrows(IllegalArgumentException.class,
                 () -> userService.registerUser(request),
                 "Provided email or username already exists");
+    }
+    @Test
+    public void getCurrentUser_allParamsOk_returnsLoginResponse() {
+
+        //given
+        var user = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        LoginResponse expected = LoginResponse.builder()
+                .email("johndoe@johndoe.pl")
+                .token("generatedToken")
+                .username("JohnDoe")
+                .bio(null)
+                .image(null)
+                .build();
+        when(jwtService.generateToken(user)).thenReturn("generatedToken");
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        //when
+        LoginResponse actual = userService.getCurrentUser();
+        //then
+        assertEquals(expected, actual);
     }
 }

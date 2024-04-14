@@ -133,7 +133,6 @@ public class UserService {
     }
 
     private User retrieveCurrentUserFromDb() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String principal = authenticationFacade.getAuthentication().getName();
         return userRepository.findByEmail(principal).orElseThrow();
     }
