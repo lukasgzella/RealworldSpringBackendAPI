@@ -4,12 +4,12 @@ import com.hibernateRealworldRelations.realworldRelations.API.services.UserServi
 import com.hibernateRealworldRelations.realworldRelations._config.JwtService;
 import com.hibernateRealworldRelations.realworldRelations.auxiliary.AuthenticationFacade;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.RegistrationRequest;
+import com.hibernateRealworldRelations.realworldRelations.dto.requests.UpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.LoginResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Role;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -103,9 +103,9 @@ public class UserServiceTest {
                 .build();
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
         //when/then
-        assertThrows(IllegalArgumentException.class,
-                () -> userService.registerUser(request),
-                "Provided email or username already exists");
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.registerUser(request));
+        assertEquals("Provided email or username already exists", exception.getMessage());
     }
 
     @Test
@@ -147,5 +147,106 @@ public class UserServiceTest {
         LoginResponse actual = userService.getCurrentUser();
         //then
         assertEquals(expected, actual);
+    }
+    @Test
+    public void updateUser_newEmail_userUpdated() {
+        //given
+        UpdateRequest request = UpdateRequest.builder()
+                .email("newEmail")
+                .build();
+        var user = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        LoginResponse expected = LoginResponse.builder()
+                .email("newEmail")
+                .token("generatedToken")
+                .username("JohnDoe")
+                .bio(null)
+                .image(null)
+                .build();
+        when(jwtService.generateToken(user)).thenReturn("generatedToken");
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        //when
+        LoginResponse actual = userService.updateUser(request);
+        //then
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void updateUser_newBioNewImage_userUpdated() {
+        //given
+        UpdateRequest request = UpdateRequest.builder()
+                .bio("newBio")
+                .image("newImage")
+                .build();
+        var user = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        LoginResponse expected = LoginResponse.builder()
+                .email("johndoe@johndoe.pl")
+                .token("generatedToken")
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .build();
+        when(jwtService.generateToken(user)).thenReturn("generatedToken");
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        //when
+        LoginResponse actual = userService.updateUser(request);
+        //then
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void updateUser_sameEmail_throwsIllegalArgumentException() {
+        //given
+        UpdateRequest request = UpdateRequest.builder()
+                .email("johndoe@johndoe.pl")
+                .build();
+        var user = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
+        //when/then
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUser(request));
+        assertEquals("Provided email already exists", exception.getMessage());
+    }
+    @Test
+    public void updateUser_sameUsername_throwsIllegalArgumentException() {
+        //given
+        UpdateRequest request = UpdateRequest.builder()
+                .username("JohnDoe")
+                .build();
+        var user = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .role(Role.USER)
+                .build();
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(user.getEmail());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
+        //when/then
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.updateUser(request));
+        assertEquals("Provided username already exists", exception.getMessage());
     }
 }

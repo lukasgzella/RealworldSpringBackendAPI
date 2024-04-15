@@ -21,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -92,8 +94,8 @@ public class UserService {
         if (isUsernameExists(request.getUsername())) {
             throw new IllegalArgumentException("Provided username already exists");
         }
-
-        User updatedUser = userRepository.save(updateRequestedFields(user, request));
+        User updatedUser = updateRequestedFields(user, request);
+        updatedUser = userRepository.save(updatedUser);
 
         var jwtToken = jwtService.generateToken(user);
         return LoginResponse.builder()
