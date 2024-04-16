@@ -6,8 +6,10 @@ import com.hibernateRealworldRelations.realworldRelations.auxiliary.Authenticati
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.RegistrationRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.UpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.LoginResponse;
+import com.hibernateRealworldRelations.realworldRelations.dto.responses.ProfileResponse;
 import com.hibernateRealworldRelations.realworldRelations.entity.Role;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
+import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
 import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -122,6 +124,7 @@ public class UserServiceTest {
                 () -> userService.registerUser(request),
                 "Provided email or username already exists");
     }
+
     @Test
     public void getCurrentUser_allParamsOk_returnsLoginResponse() {
 
@@ -148,6 +151,7 @@ public class UserServiceTest {
         //then
         assertEquals(expected, actual);
     }
+
     @Test
     public void updateUser_newEmail_userUpdated() {
         //given
@@ -177,6 +181,7 @@ public class UserServiceTest {
         //then
         assertEquals(expected, actual);
     }
+
     @Test
     public void updateUser_newBioNewImage_userUpdated() {
         //given
@@ -207,6 +212,7 @@ public class UserServiceTest {
         //then
         assertEquals(expected, actual);
     }
+
     @Test
     public void updateUser_sameEmail_throwsIllegalArgumentException() {
         //given
@@ -228,6 +234,7 @@ public class UserServiceTest {
                 () -> userService.updateUser(request));
         assertEquals("Provided email already exists", exception.getMessage());
     }
+
     @Test
     public void updateUser_sameUsername_throwsIllegalArgumentException() {
         //given
@@ -248,5 +255,114 @@ public class UserServiceTest {
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> userService.updateUser(request));
         assertEquals("Provided username already exists", exception.getMessage());
+    }
+
+    @Test
+    public void getProfile_sameUsername_returnsProfileResponse() {
+        //given
+        String username = "JohnDoe";
+        var userTo = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .bio("newBio")
+                .image("newImage")
+                .role(Role.USER)
+                .build();
+        ProfileResponse expected = ProfileResponse.builder()
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .following(false)
+                .build();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userTo));
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn("anonymousUser");
+        //when
+        ProfileResponse actual = userService.getProfile(username);
+        //then
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getProfile_followingTrue_returnsProfileResponse() {
+        //given
+        String username = "JohnDoe";
+        var authenticatedUser = User.builder()
+                .username("FollowingJohnDoe")
+                .email("following@johndoe.pl")
+                .password("password")
+                .bio("followingBio")
+                .image("followingImage")
+                .role(Role.USER)
+                .build();
+        var userTo = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .bio("newBio")
+                .image("newImage")
+                .role(Role.USER)
+                .build();
+        ProfileResponse expected = ProfileResponse.builder()
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .following(true)
+                .build();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userTo));
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(authenticatedUser.getEmail());
+        when(userRepository.findByEmail(authenticatedUser.getEmail())).thenReturn(Optional.of(authenticatedUser));
+        when(followerRepository.existsByFromTo(authenticatedUser.getUsernameDB(), username)).thenReturn(true);
+        //when
+        ProfileResponse actual = userService.getProfile(username);
+        //then
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void getProfile_followingFalse_returnsProfileResponse() {
+        //given
+        String username = "JohnDoe";
+        var authenticatedUser = User.builder()
+                .username("NotFollowingJohnDoe")
+                .email("notFollowing@johndoe.pl")
+                .password("password")
+                .bio("notFollowingBio")
+                .image("notFollowingImage")
+                .role(Role.USER)
+                .build();
+        var userTo = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .bio("newBio")
+                .image("newImage")
+                .role(Role.USER)
+                .build();
+        ProfileResponse expected = ProfileResponse.builder()
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .following(false)
+                .build();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userTo));
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(authenticatedUser.getEmail());
+        when(userRepository.findByEmail(authenticatedUser.getEmail())).thenReturn(Optional.of(authenticatedUser));
+        when(followerRepository.existsByFromTo(authenticatedUser.getUsernameDB(), username)).thenReturn(false);
+        //when
+        ProfileResponse actual = userService.getProfile(username);
+        //then
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void getProfile_notExistingUsername_throwsNoSuchUserException() {
+        //given
+        String username = "notExistingUsername";
+        when(userRepository.findByUsername(username)).thenThrow(NoSuchUserException.class);
+        //when/then
+        NoSuchUserException exception = assertThrows(NoSuchUserException.class,
+                () -> userService.getProfile(username));
     }
 }

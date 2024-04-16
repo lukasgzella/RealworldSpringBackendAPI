@@ -10,6 +10,7 @@ import com.hibernateRealworldRelations.realworldRelations.dto.responses.ProfileR
 import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.Role;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
+import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
 import com.hibernateRealworldRelations.realworldRelations.repository.FollowerRepository;
 import com.hibernateRealworldRelations.realworldRelations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -141,11 +142,10 @@ public class UserService {
 
     @Transactional
     public ProfileResponse getProfile(String username) {
-        // todo exception no such user
-        User userTo = userRepository.findByUsername(username).orElseThrow();
+        User userTo = userRepository.findByUsername(username)
+                .orElseThrow(NoSuchUserException::new);
         String emailFrom = authenticationFacade.getAuthentication().getName();
         boolean isFollowing = false;
-        System.out.println(emailFrom);
         if (!emailFrom.equals("anonymousUser")) {
             User userFrom = userRepository.findByEmail(emailFrom).orElseThrow();
             isFollowing = followerRepository.existsByFromTo(userFrom.getUsernameDB(), username);
