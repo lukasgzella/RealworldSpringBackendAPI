@@ -7,6 +7,7 @@ import com.hibernateRealworldRelations.realworldRelations.dto.requests.Registrat
 import com.hibernateRealworldRelations.realworldRelations.dto.requests.UpdateRequest;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.LoginResponse;
 import com.hibernateRealworldRelations.realworldRelations.dto.responses.ProfileResponse;
+import com.hibernateRealworldRelations.realworldRelations.entity.Follower;
 import com.hibernateRealworldRelations.realworldRelations.entity.Role;
 import com.hibernateRealworldRelations.realworldRelations.entity.User;
 import com.hibernateRealworldRelations.realworldRelations.exceptions.NoSuchUserException;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,8 +34,8 @@ public class UserServiceTest {
     private JwtService jwtService;
     private AuthenticationManager authenticationManager;
     private AuthenticationFacade authenticationFacade;
-    private UserService userService;
     private Authentication auth;
+    private UserService userService;
 
     @BeforeEach
     public void mockFields() {
@@ -364,5 +366,83 @@ public class UserServiceTest {
         //when/then
         NoSuchUserException exception = assertThrows(NoSuchUserException.class,
                 () -> userService.getProfile(username));
+    }
+    @Test
+    public void followUser_followingFalse_returnsProfileResponse() {
+        //given
+        String username = "JohnDoe";
+        var authenticatedUser = User.builder()
+                .username("NotFollowingJohnDoe")
+                .email("notFollowing@johndoe.pl")
+                .password("password")
+                .bio("notFollowingBio")
+                .image("notFollowingImage")
+                .following(new HashSet<>())
+                .role(Role.USER)
+                .build();
+        var userTo = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .bio("newBio")
+                .image("newImage")
+                .followers(new HashSet<>())
+                .role(Role.USER)
+                .build();
+        ProfileResponse expected = ProfileResponse.builder()
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .following(true)
+                .build();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userTo));
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(authenticatedUser.getEmail());
+        when(userRepository.findByEmail(authenticatedUser.getEmail())).thenReturn(Optional.of(authenticatedUser));
+        when(followerRepository.existsByFromTo(authenticatedUser.getUsernameDB(), username)).thenReturn(false);
+        //when
+        ProfileResponse actual = userService.followUser(username);
+        //then
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void unfollowUser_returnsProfileResponse() {
+        //given
+        String username = "JohnDoe";
+        var authenticatedUser = User.builder()
+                .username("followingJohnDoe")
+                .email("following@johndoe.pl")
+                .password("password")
+                .bio("followingBio")
+                .image("followingImage")
+                .following(new HashSet<>())
+                .role(Role.USER)
+                .build();
+        var userTo = User.builder()
+                .username("JohnDoe")
+                .email("johndoe@johndoe.pl")
+                .password("password")
+                .bio("newBio")
+                .image("newImage")
+                .followers(new HashSet<>())
+                .role(Role.USER)
+                .build();
+        ProfileResponse expected = ProfileResponse.builder()
+                .username("JohnDoe")
+                .bio("newBio")
+                .image("newImage")
+                .following(false)
+                .build();
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(userTo));
+        when(authenticationFacade.getAuthentication()).thenReturn(auth);
+        when(auth.getName()).thenReturn(authenticatedUser.getEmail());
+        when(userRepository.findByEmail(authenticatedUser.getEmail())).thenReturn(Optional.of(authenticatedUser));
+        when(followerRepository.existsByFromTo(authenticatedUser.getUsernameDB(), username)).thenReturn(true);
+        when(followerRepository.findByFromTo(authenticatedUser.getUsernameDB(), username))
+                .thenReturn(Optional.of(new Follower(authenticatedUser, userTo)));
+        //when
+        ProfileResponse actual = userService.unfollowUser(username);
+        //then
+        assertEquals(expected, actual);
     }
 }
