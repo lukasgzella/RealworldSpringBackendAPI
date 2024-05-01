@@ -161,9 +161,9 @@ public class UserService {
 
     @Transactional
     public ProfileResponse followUser(String username) {
-        User userTo = userRepository.findByUsername(username).orElseThrow();
+        User userTo = userRepository.findByUsername(username).orElseThrow(NoSuchUserException::new);
         ProfileResponse res = ProfileResponse.builder()
-                .username(userTo.getUsername())
+                .username(userTo.getUsernameDB())
                 .bio(userTo.getBio())
                 .image(userTo.getImage())
                 .following(true)
@@ -188,7 +188,7 @@ public class UserService {
     public ProfileResponse unfollowUser(String username) {
         User userTo = userRepository.findByUsername(username).orElseThrow();
         ProfileResponse res = ProfileResponse.builder()
-                .username(userTo.getUsername())
+                .username(userTo.getUsernameDB())
                 .bio(userTo.getBio())
                 .image(userTo.getImage())
                 .following(false)

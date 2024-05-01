@@ -22,7 +22,7 @@ public class UserController {
     private final ArticleServiceHTTP articleServiceHTTP;
 
     // Authentication
-    @PostMapping("/api/users/login")
+    @PostMapping("/users/login")
     public ResponseEntity<Map<String, LoginResponse>> login(
             @RequestBody LoginRequest request
     ) {
@@ -30,7 +30,7 @@ public class UserController {
     }
 
     // Registration
-    @PostMapping("/api/users")
+    @PostMapping("/users")
     public ResponseEntity<Map<String, LoginResponse>> registerUser(
             @RequestBody RegistrationRequest request
     ) {
@@ -38,13 +38,13 @@ public class UserController {
     }
 
     // Get Current User
-    @GetMapping("/api/user")
+    @GetMapping("/user")
     public ResponseEntity<Map<String, LoginResponse>> currentUser() {
         return ResponseEntity.ok(Map.of("user", service.getCurrentUser()));
     }
 
     // Update User
-    @PutMapping("/api/user")
+    @PutMapping("/user")
     public ResponseEntity<Map<String, LoginResponse>> updateUser(
             @RequestBody UpdateRequest request
     ) {
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     // Get Profile
-    @GetMapping("/api/profiles/{username}")
+    @GetMapping("/profiles/{username}")
     public ResponseEntity<Map<String, ProfileResponse>> getProfile(
             @PathVariable("username") String username
     ) {
@@ -60,7 +60,7 @@ public class UserController {
     }
 
     // Follow User
-    @PostMapping("/api/profiles/{username}/follow")
+    @PostMapping("/profiles/{username}/follow")
     public ResponseEntity<Map<String, ProfileResponse>> followUser(
             @PathVariable("username") String username
     ) {
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     // Unfollow User
-    @DeleteMapping("/api/profiles/{username}/follow")
+    @DeleteMapping("/profiles/{username}/follow")
     public ResponseEntity<Map<String, ProfileResponse>> unfollowUser(
             @PathVariable("username") String username
     ) {

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RequestMapping("/api/articles")
+@RequestMapping("/articles")
 @RestController
 @RequiredArgsConstructor
 public class ArticleControllerHTTP {

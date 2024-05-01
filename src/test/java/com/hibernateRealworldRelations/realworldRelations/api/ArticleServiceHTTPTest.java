@@ -91,39 +91,39 @@ public class ArticleServiceHTTPTest {
 
 
 
-    @Test
-    public void getArticles_allParamsOk_returnsMultipleArticleResponse() {
-        //given
-        String tag = "";
-        String author = "";
-        String favorited = "";
-        int limit = 1;
-        int offset = 1;
-
-        List<ArticleResponse> articleResponses = new ArrayList<>();
-        long articlesCount = 1;
-
-        Page<Article> page = articleRepository
-                .findArticlesByParamsPageOrderedByMostRecentFirst(author, tag, favorited, PageRequest.of(offset, limit));
-
-        User authenticated = checkIfAuthenticated();
-        if (authenticated != null) {
-            articleResponses = page.map(
-                            article -> articleResponseMapperWithAuthenticatedUser.apply(authenticated, article))
-                    .toList();
-        } else {
-            articleResponses = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
-        }
-        return new MultipleArticleResponse(articleResponses, articlesCount);
-
-        MultipleArticleResponse expected =
-        when(userRepository.save(user)).thenReturn(user);
-        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
-        when(jwtService.generateToken(user)).thenReturn("generatedToken");
-        //when
-        LoginResponse actual = userService.registerUser(request);
-        //then
-        assertEquals(expected, actual);
-        verify(userRepository).save(user);
-    }
+//    @Test
+//    public void getArticles_allParamsOk_returnsMultipleArticleResponse() {
+//        //given
+//        String tag = "";
+//        String author = "";
+//        String favorited = "";
+//        int limit = 1;
+//        int offset = 1;
+//
+//        List<ArticleResponse> articleResponses = new ArrayList<>();
+//        long articlesCount = 1;
+//
+//        Page<Article> page = articleRepository
+//                .findArticlesByParamsPageOrderedByMostRecentFirst(author, tag, favorited, PageRequest.of(offset, limit));
+//
+//        User authenticated = checkIfAuthenticated();
+//        if (authenticated != null) {
+//            articleResponses = page.map(
+//                            article -> articleResponseMapperWithAuthenticatedUser.apply(authenticated, article))
+//                    .toList();
+//        } else {
+//            articleResponses = page.map(article -> new ArticleResponseMapper().apply(article)).toList();
+//        }
+//        return new MultipleArticleResponse(articleResponses, articlesCount);
+//
+//        MultipleArticleResponse expected =
+//        when(userRepository.save(user)).thenReturn(user);
+//        when(passwordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
+//        when(jwtService.generateToken(user)).thenReturn("generatedToken");
+//        //when
+//        LoginResponse actual = userService.registerUser(request);
+//        //then
+//        assertEquals(expected, actual);
+//        verify(userRepository).save(user);
+//    }
 }
